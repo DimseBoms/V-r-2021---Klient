@@ -1,5 +1,8 @@
 package com.example.chatroom;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,6 +24,7 @@ public class Tilkobling {
                 socket = new Socket(HOST, PORT);
                 utStrøm = new ObjectOutputStream(socket.getOutputStream());
                 innStrøm = new ObjectInputStream(socket.getInputStream());
+
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.print("Klarte ikke koble til");
@@ -37,7 +41,7 @@ public class Tilkobling {
         }
     }
     public void sendMelding(String tekst, String brukerNavn) {
-        Map meldingMap = new HashMap<>();
+        Map<Object, Object> meldingMap = new HashMap<>();
         meldingMap.put(tekst, brukerNavn);
         try {
             utStrøm.writeObject(meldingMap);
@@ -45,5 +49,20 @@ public class Tilkobling {
             e.printStackTrace();
             System.out.println("Feil ved sending av melding til server");
         }
+    }
+
+    public ObservableList<String> getRom() {
+        ObservableList<String> liste = FXCollections.observableArrayList();
+        try {
+            HashMap<Object, Object> query = new HashMap<>();
+            query.put("query", "getRom");
+            utStrøm.writeObject(query);
+            ArrayList innListe = (ArrayList) innStrøm.readObject();
+            // lag liste om til ObservableList
+            return liste;
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        return liste;
     }
 }

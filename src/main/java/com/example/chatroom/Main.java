@@ -25,6 +25,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        GuiKonstruktør.connect();
         brukerNavn = "Gaute";
                 //JOptionPane.showInputDialog(null,
                 //"Hva er navnet ditt?");
@@ -34,7 +35,6 @@ public class Main extends Application {
         borderPane.setLeft(GuiKonstruktør.makeLeft());
         borderPane.setCenter(GuiKonstruktør.makeCenter());
         borderPane.setRight(GuiKonstruktør.makeRight());
-        GuiKonstruktør.connect();
 
         Scene scene = new Scene(borderPane, WIDTH, HEIGHT);
         stage.setTitle("Hello!");

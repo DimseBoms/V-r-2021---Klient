@@ -11,12 +11,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class GuiKonstruktør {
     private static Thread connTråd;
@@ -69,8 +64,7 @@ public class GuiKonstruktør {
     public static VBox makeRight(){
         VBox right = new VBox();
         Button addRoom = new Button("Legg til Rom");
-        ObservableList<String> names = FXCollections.observableArrayList(
-                "ChatRoom 1", "ChatRoom 2", "ChatRoom 3", "ChatRoom 4", "ChatRoom 5", "ChatRoom 6", "ChatRoom 7");
+        ObservableList<String> names = tilkobling.getRom();
         ListView<String> listView = new ListView<String>(names);
         right.getChildren().addAll(new Label("Rom"), listView);
 
