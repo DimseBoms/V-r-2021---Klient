@@ -1,13 +1,11 @@
 package com.example.chatroom;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,24 +14,46 @@ public class Tilkobling {
     static final String HOST = "localhost"; // Dima sin offentlige IP
     static ObjectInputStream innStrøm;
     static ObjectOutputStream utStrøm;
+    static ObservableList<Rom> romOL;
     Socket socket;
     public Tilkobling () {
         new Thread(() -> {
             try {
-                System.out.println("Tråden for tilkobling blir opprettet");
                 socket = new Socket(HOST, PORT);
                 utStrøm = new ObjectOutputStream(socket.getOutputStream());
                 innStrøm = new ObjectInputStream(socket.getInputStream());
+                System.out.println("Opprettet tilkobling til server");
+                if (sjekkBrukernavn()) {
+                    hentRom();
+                } else {
+                    throw new RuntimeException("Brukernavnsjekk feilet");
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.print("Klarte ikke koble til");
             }
         }).start();
     }
+
+    // TODO: Lage brukernavnsjekk som skal sende bruker og returnere om navnet er lovlig.
+    private boolean sjekkBrukernavn() {
+        HashMap<Object, Object> sendBrukerMap = new HashMap<>();
+        sendBrukerMap.put("brukernavn", Main.getBrukernavn());
+        try {
+            utStrøm.writeObject(sendBrukerMap);
+            Boolean suksess = (Boolean) innStrøm.readObject();
+            utStrøm.close();
+            return suksess;
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public void lukkTilkobling() {
         try {
-            utStrøm.close();
-            innStrøm.close();
+            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Feil ved lukking av tilkobling");
@@ -50,7 +70,7 @@ public class Tilkobling {
         }
     }
 
-    public void getRom(ObservableList ol) {
+    public void hentRom() {
         new Thread(() -> {
             try {
                 System.out.println("før lesing av innStrøm");
@@ -61,9 +81,10 @@ public class Tilkobling {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
             }
-        });
+        }).start();
     }
 
+    // TODO: Denne metoden under her skal benyttes for å bygge/hente ut en observablelist av rom
     //public ObservableList<String> getRom() {
     //    ObservableList<String> liste = FXCollections.observableArrayList();
     //    try {

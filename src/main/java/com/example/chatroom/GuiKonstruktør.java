@@ -44,7 +44,7 @@ public class GuiKonstruktør {
         StackPane stack = new StackPane();
         Label lblAppNavn = new Label("HOT CHICKS");
         lblAppNavn.setFont(Font.font("Verdana", FontWeight.BOLD, 30));
-        Label lblBrukerNavn = new Label("Du er innlogget som: " + Main.getBrukerNavn());
+        Label lblBrukerNavn = new Label("Du er innlogget som: " + Main.getBrukernavn());
         lblBrukerNavn.setAlignment(Pos.BOTTOM_CENTER);
         lblBrukerNavn.setFont(fntStandard);
         top.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -63,7 +63,6 @@ public class GuiKonstruktør {
 
     public static VBox makeRight(){
         ObservableList<String> names = FXCollections.observableArrayList("Test");
-        tilkobling.getRom(names);
         VBox right = new VBox();
         Button addRoom = new Button("Legg til Rom");
         ListView<String> listView = new ListView<String>(names);
@@ -117,7 +116,7 @@ public class GuiKonstruktør {
         writeMessage.setPrefColumnCount((int)(Main.WIDTH/7));
         Button sendButton = new Button("Send");
         sendButton.setOnAction( e -> {
-            nyMelding(writeMessage.getText(), Main.getBrukerNavn());
+            nyMelding(writeMessage.getText(), Main.getBrukernavn());
             messageField.heightProperty().addListener(observable -> sp.setVvalue(1.0));
         } );
         bottom.setAlignment(Pos.CENTER_RIGHT);

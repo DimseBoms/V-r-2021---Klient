@@ -1,32 +1,23 @@
 package com.example.chatroom;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class Main extends Application {
     //Varibler
     public static final double WIDTH = 1000;
     public static final double HEIGHT = 800;
 
-    private static String brukerNavn = "NULL";
+    private static String brukernavn = "NULL";
 
     @Override
     public void start(Stage stage) throws IOException {
         GuiKonstruktør.connect();
-        brukerNavn = "Gaute";
+        brukernavn = "Gaute";
                 //JOptionPane.showInputDialog(null,
                 //"Hva er navnet ditt?");
         BorderPane borderPane = new BorderPane();
@@ -46,8 +37,8 @@ public class Main extends Application {
         launch();
     }
 
-    public static String getBrukerNavn() {
-        return brukerNavn;
+    public static String getBrukernavn() {
+        return brukernavn;
     }
 
 }
