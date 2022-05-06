@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class Tilkobling {
     static final int PORT = 8000;
-    static final String HOST = "79.161.164.236"; // Dima sin offentlige IP
+    static final String HOST = "localhost"; // Dima sin offentlige IP
     static ObjectInputStream innStrøm;
     static ObjectOutputStream utStrøm;
     Socket socket;
