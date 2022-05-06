@@ -24,7 +24,6 @@ public class Tilkobling {
                 socket = new Socket(HOST, PORT);
                 utStrøm = new ObjectOutputStream(socket.getOutputStream());
                 innStrøm = new ObjectInputStream(socket.getInputStream());
-
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.print("Klarte ikke koble til");
@@ -51,18 +50,32 @@ public class Tilkobling {
         }
     }
 
-    public ObservableList<String> getRom() {
-        ObservableList<String> liste = FXCollections.observableArrayList();
-        try {
-            HashMap<Object, Object> query = new HashMap<>();
-            query.put("query", "getRom");
-            utStrøm.writeObject(query);
-            ArrayList innListe = (ArrayList) innStrøm.readObject();
-            // lag liste om til ObservableList
-            return liste;
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
-        return liste;
+    public void getRom(ObservableList ol) {
+        new Thread(() -> {
+            try {
+                System.out.println("før lesing av innStrøm");
+                System.out.println(innStrøm.readObject());
+                System.out.println("etter lesing av innStrøm");
+            }
+            catch (IOException | ClassNotFoundException e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
+            }
+        });
     }
+
+    //public ObservableList<String> getRom() {
+    //    ObservableList<String> liste = FXCollections.observableArrayList();
+    //    try {
+    //        HashMap<Object, Object> query = new HashMap<>();
+    //        query.put("query", "getRom");
+    //        utStrøm.writeObject(query);
+    //       ArrayList innListe = (ArrayList) innStrøm.readObject();
+    //        // lag liste om til ObservableList
+    //        return liste;
+    //   } catch (IOException | ClassNotFoundException e) {
+    //       System.out.println(e.getMessage());
+    //   }
+        //    return liste;
+    //}
 }
