@@ -64,6 +64,7 @@ public class Tilkobling {
         }
     }
     // Sjekker inn bruker på server og mottar romliste dersom innsjekking er OK
+    // TODO: Må separere metoden og vente på brukernavn inn
     private void sjekkInnBruker() {
         velgBrukernavnDialog();
         System.out.println("Starter sjekkInnBruker");
