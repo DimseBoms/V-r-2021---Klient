@@ -28,7 +28,7 @@ public class Tilkobling {
             }
         }).start();
     }
-    // TODO: Metode som skal sende brukernavn til server og sjekke om det er tilgjengelig.
+    // Sjekker inn bruker på server og mottar romliste dersom innsjekking er OK
     private void sjekkInnBruker() {
         System.out.println("Starter sjekkInnBruker");
         Map<Object, Object> brukerMap = new HashMap<>();

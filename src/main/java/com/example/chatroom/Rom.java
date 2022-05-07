@@ -1,13 +1,19 @@
 package com.example.chatroom;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.util.ArrayList;
 
 public class Rom {
+    @Override
+    public String toString() {return navn;}
+
     private String navn;
-    private static ArrayList<Rom> romliste = new ArrayList<>();
+    private static ObservableList<Rom> romliste = FXCollections.observableArrayList();
     public Rom (String romnavn) {
         this.navn = romnavn;
         romliste.add(this);
     }
-    public ArrayList<Rom> getRomliste() {return romliste;}
+    public static ObservableList<Rom> getRomliste() {return romliste;}
 }
