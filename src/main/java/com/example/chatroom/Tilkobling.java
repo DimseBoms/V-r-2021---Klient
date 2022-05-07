@@ -56,7 +56,7 @@ public class Tilkobling {
                 System.out.println("Lagt til rom");
                 tempRomListe.forEach(Rom::new);
             } else if ((int) input.get("status") == 0) {
-                System.out.println("Bruker allerede tatt");
+                System.out.println("Romnavn eksisterer allerede");
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
