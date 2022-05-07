@@ -14,6 +14,10 @@ public class Main extends Application {
 
     private static String brukernavn = "NULL";
 
+    public static String getBrukerNavn() {
+        return brukernavn;
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
         GuiKonstruktør.connect();
