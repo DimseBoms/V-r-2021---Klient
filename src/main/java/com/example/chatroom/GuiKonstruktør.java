@@ -18,6 +18,7 @@ public class GuiKonstruktør {
     public static Font fntStandard = new Font("Verdana",15);
     public static VBox messageField = new VBox();
     private static Tilkobling tilkobling = new Tilkobling();
+    public static String romnavn;
 
     protected static void nyMelding(String tekst, String brukerNavn) {
         tilkobling.sendMelding(tekst, brukerNavn);
@@ -66,7 +67,18 @@ public class GuiKonstruktør {
         VBox right = new VBox();
         Button addRoom = new Button("Legg til Rom");
         ListView<Rom> listView = new ListView<Rom>(names);
-        right.getChildren().addAll(new Label("Rom"), listView);
+
+        // legger inn tekstfelt og knapp for å opprette nytt rom
+        // enkel løsning for testing
+        TextField tf = new TextField();
+        tf.setPromptText("Navngi rom");
+        Button button = new Button("Opprett Rom");
+        button.setOnAction(e -> {
+            romnavn = tf.getText();
+            tilkobling.opprettRom();
+        });
+
+        right.getChildren().addAll(new Label("Rom"), listView, tf, button);
         return right;
     }
 

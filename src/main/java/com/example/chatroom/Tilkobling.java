@@ -21,13 +21,42 @@ public class Tilkobling {
                 socket = new Socket(HOST, PORT);
                 utStrøm = new ObjectOutputStream(socket.getOutputStream());
                 innStrøm = new ObjectInputStream(socket.getInputStream());
-                sjekkInnBruker();
+                sjekkInnBruker(); // ER DET FØRSTE SOM MÅ SKJE. BRUKER FÅR LISTE MED ROM SOM RESPONS
+  //              opprettRom(); // REQUEST FRA BRUKER OM Å OPPRETTE NYTT ROM
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.print("Klarte ikke koble til");
             }
         }).start();
     }
+
+    /**
+     * Metode for å sende request om nytt rom (create) til server
+     */
+    protected void opprettRom() {
+        System.out.println("Starter metoden opprettRom");
+        Map<Object, Object> brukerMap = new HashMap<>();
+        brukerMap.put("query", "opprettRom");
+        brukerMap.put("brukernavn", Main.getBrukerNavn());
+        brukerMap.put("rom", Main.getBrukerNavn());
+        try {
+            utStrøm.writeObject(brukerMap);
+            System.out.println(brukerMap);
+            System.out.println("Sendt brukerMap");
+            Map input = (Map) innStrøm.readObject();
+            if ((int) input.get("status") == 1) {
+                ArrayList<String> tempRomListe = (ArrayList<String>) input.get("romliste");
+                System.out.println("Lagt til rom");
+                tempRomListe.forEach(Rom::new);
+            } else if ((int) input.get("status") == 0) {
+                System.out.println("Bruker allerede tatt");
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            System.out.println("Feil oppstått ved innsjekking av bruker");
+        }
+    }
+
     // Sjekker inn bruker på server og mottar romliste dersom innsjekking er OK
     private void sjekkInnBruker() {
         System.out.println("Starter sjekkInnBruker");
@@ -100,6 +129,6 @@ public class Tilkobling {
     //   } catch (IOException | ClassNotFoundException e) {
     //       System.out.println(e.getMessage());
     //   }
-        //    return liste;
+    //    return liste;
     //}
 }
