@@ -63,7 +63,6 @@ public class GuiKonstruktør {
 
     public static VBox makeRight(){
         ObservableList<String> names = FXCollections.observableArrayList("Test");
-        tilkobling.getRom(names);
         VBox right = new VBox();
         Button addRoom = new Button("Legg til Rom");
         ListView<String> listView = new ListView<String>(names);

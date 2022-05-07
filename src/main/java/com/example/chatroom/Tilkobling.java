@@ -1,8 +1,5 @@
 package com.example.chatroom;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -24,12 +21,37 @@ public class Tilkobling {
                 socket = new Socket(HOST, PORT);
                 utStrøm = new ObjectOutputStream(socket.getOutputStream());
                 innStrøm = new ObjectInputStream(socket.getInputStream());
+                sjekkInnBruker();
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.print("Klarte ikke koble til");
             }
         }).start();
     }
+    // TODO: Metode som skal sende brukernavn til server og sjekke om det er tilgjengelig.
+    private void sjekkInnBruker() {
+        System.out.println("Starter sjekkInnBruker");
+        Map<Object, Object> brukerMap = new HashMap<>();
+        brukerMap.put("query", "sjekkInnBruker");
+        brukerMap.put("brukernavn", Main.getBrukerNavn());
+        try {
+            utStrøm.writeObject(brukerMap);
+            System.out.println(brukerMap);
+            System.out.println("Sendt brukerMap");
+            Map input = (Map) innStrøm.readObject();
+            if ((int) input.get("status") == 1) {
+                ArrayList<String> tempRomListe = (ArrayList<String>) input.get("romliste");
+                System.out.println("Lagt til rom");
+                tempRomListe.forEach(Rom::new);
+            } else if ((int) input.get("status") == 0) {
+                System.out.println("Bruker allerede tatt");
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            System.out.println("Feil oppstått ved innsjekking av bruker");
+        }
+    }
+
     public void lukkTilkobling() {
         try {
             utStrøm.close();
@@ -41,7 +63,9 @@ public class Tilkobling {
     }
     public void sendMelding(String tekst, String brukerNavn) {
         Map<Object, Object> meldingMap = new HashMap<>();
-        meldingMap.put(tekst, brukerNavn);
+        meldingMap.put("query", "sendMelding");
+        meldingMap.put("tekst", tekst);
+        meldingMap.put("brukernavn", brukerNavn);
         try {
             utStrøm.writeObject(meldingMap);
         } catch (IOException e) {
@@ -50,7 +74,7 @@ public class Tilkobling {
         }
     }
 
-    public void getRom(ObservableList ol) {
+    public void getRom() {
         new Thread(() -> {
             try {
                 System.out.println("før lesing av innStrøm");
