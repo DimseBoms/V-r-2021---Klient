@@ -1,5 +1,9 @@
 package com.example.chatroom;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.TextInputDialog;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -11,6 +15,7 @@ import java.util.Map;
 public class Tilkobling {
     static final int PORT = 8000;
     static final String HOST = "localhost"; // Dima sin offentlige IP
+    private static String brukernavn = "";
     static ObjectInputStream innStrøm;
     static ObjectOutputStream utStrøm;
     Socket socket;
@@ -29,7 +34,9 @@ public class Tilkobling {
             }
         }).start();
     }
-
+    public static void setBrukernavn(String brukernavn) {
+        Tilkobling.brukernavn = brukernavn;
+    }
     /**
      * Metode for å sende request om nytt rom (create) til server
      */
@@ -37,8 +44,8 @@ public class Tilkobling {
         System.out.println("Starter metoden opprettRom");
         Map<Object, Object> brukerMap = new HashMap<>();
         brukerMap.put("query", "opprettRom");
-        brukerMap.put("brukernavn", Main.getBrukerNavn());
-        brukerMap.put("rom", Main.getBrukerNavn());
+        brukerMap.put("brukernavn", brukernavn);
+        brukerMap.put("rom", brukernavn);
         try {
             utStrøm.writeObject(brukerMap);
             System.out.println(brukerMap);
@@ -56,13 +63,13 @@ public class Tilkobling {
             System.out.println("Feil oppstått ved innsjekking av bruker");
         }
     }
-
     // Sjekker inn bruker på server og mottar romliste dersom innsjekking er OK
     private void sjekkInnBruker() {
+        velgBrukernavnDialog();
         System.out.println("Starter sjekkInnBruker");
         Map<Object, Object> brukerMap = new HashMap<>();
         brukerMap.put("query", "sjekkInnBruker");
-        brukerMap.put("brukernavn", Main.getBrukerNavn());
+        brukerMap.put("brukernavn", brukernavn);
         try {
             utStrøm.writeObject(brukerMap);
             System.out.println(brukerMap);
@@ -73,14 +80,31 @@ public class Tilkobling {
                 System.out.println("Lagt til rom");
                 tempRomListe.forEach(Rom::new);
             } else if ((int) input.get("status") == 0) {
-                System.out.println("Bruker allerede tatt");
+                brukernavnIkkeTilgjengelig();
+                sjekkInnBruker();
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             System.out.println("Feil oppstått ved innsjekking av bruker");
         }
     }
-
+    private void velgBrukernavnDialog() {
+        Platform.runLater(() -> {
+            TextInputDialog inputdialog = new TextInputDialog("");
+            inputdialog.setContentText("Brukernavn: ");
+            inputdialog.setHeaderText("Innlogging");
+            inputdialog.showAndWait();
+            Tilkobling.setBrukernavn(inputdialog.getEditor().getText());
+            GuiKonstruktør.oppdaterBrukernavn();
+        });
+    }
+    private void brukernavnIkkeTilgjengelig() {
+        Platform.runLater(() -> {
+            Alert utilgjengeligBrukerAlert = new Alert(Alert.AlertType.ERROR);
+            utilgjengeligBrukerAlert.setHeaderText("Brukernavn utilgjengelig");
+            utilgjengeligBrukerAlert.show();
+        });
+    }
     public void lukkTilkobling() {
         try {
             utStrøm.close();
@@ -102,33 +126,7 @@ public class Tilkobling {
             System.out.println("Feil ved sending av melding til server");
         }
     }
-
-    public void getRom() {
-        new Thread(() -> {
-            try {
-                System.out.println("før lesing av innStrøm");
-                System.out.println(innStrøm.readObject());
-                System.out.println("etter lesing av innStrøm");
-            }
-            catch (IOException | ClassNotFoundException e) {
-                System.out.println(e.getMessage());
-                e.printStackTrace();
-            }
-        });
+    public String getBrukernavn() {
+        return brukernavn;
     }
-
-    //public ObservableList<String> getRom() {
-    //    ObservableList<String> liste = FXCollections.observableArrayList();
-    //    try {
-    //        HashMap<Object, Object> query = new HashMap<>();
-    //        query.put("query", "getRom");
-    //        utStrøm.writeObject(query);
-    //       ArrayList innListe = (ArrayList) innStrøm.readObject();
-    //        // lag liste om til ObservableList
-    //        return liste;
-    //   } catch (IOException | ClassNotFoundException e) {
-    //       System.out.println(e.getMessage());
-    //   }
-    //    return liste;
-    //}
 }

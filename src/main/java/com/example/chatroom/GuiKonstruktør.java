@@ -19,6 +19,7 @@ public class GuiKonstruktør {
     public static VBox messageField = new VBox();
     private static Tilkobling tilkobling = new Tilkobling();
     public static String romnavn;
+    public static Label lblBrukerNavn;
 
     protected static void nyMelding(String tekst, String brukerNavn) {
         tilkobling.sendMelding(tekst, brukerNavn);
@@ -34,18 +35,13 @@ public class GuiKonstruktør {
         txtTekst.setWrappingWidth(messageField.getWidth());
     }
 
-    // Metoder for å koble til socket.
-    public static void connect() {
-        connTråd = new Thread();
-    }
-
     //Konstruktør alle komponetene
     public static HBox makeTop(){
         HBox top = new HBox(10);
         StackPane stack = new StackPane();
         Label lblAppNavn = new Label("HOT CHICKS");
         lblAppNavn.setFont(Font.font("Verdana", FontWeight.BOLD, 30));
-        Label lblBrukerNavn = new Label("Du er innlogget som: " + Main.getBrukernavn());
+        lblBrukerNavn = new Label("Du er innlogget som: " + tilkobling.getBrukernavn());
         lblBrukerNavn.setAlignment(Pos.BOTTOM_CENTER);
         lblBrukerNavn.setFont(fntStandard);
         top.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -127,7 +123,7 @@ public class GuiKonstruktør {
         writeMessage.setPrefColumnCount((int)(Main.WIDTH/7));
         Button sendButton = new Button("Send");
         sendButton.setOnAction( e -> {
-            nyMelding(writeMessage.getText(), Main.getBrukernavn());
+            nyMelding(writeMessage.getText(), tilkobling.getBrukernavn());
             messageField.heightProperty().addListener(observable -> sp.setVvalue(1.0));
         } );
         bottom.setAlignment(Pos.CENTER_RIGHT);
@@ -138,6 +134,10 @@ public class GuiKonstruktør {
         bottom.getChildren().addAll(writeMessage, sendButton);
         center.getChildren().addAll(sp, bottom);
         return center;
+    }
+
+    public static void oppdaterBrukernavn() {
+        lblBrukerNavn.setText("Du er innlogget som: " + tilkobling.getBrukernavn());
     }
 }
 
