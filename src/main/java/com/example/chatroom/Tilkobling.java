@@ -28,7 +28,7 @@ public class Tilkobling {
                 utStrøm = new ObjectOutputStream(socket.getOutputStream());
                 innStrøm = new ObjectInputStream(socket.getInputStream());
                 velgBrukernavnDialog(); // ER DET FØRSTE SOM MÅ SKJE. BRUKER FÅR LISTE MED ROM SOM RESPONS
-  //              opprettRom(); // REQUEST FRA BRUKER OM Å OPPRETTE NYTT ROM
+                //              opprettRom(); // REQUEST FRA BRUKER OM Å OPPRETTE NYTT ROM
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.print("Klarte ikke koble til");
@@ -44,7 +44,25 @@ public class Tilkobling {
     protected void opprettRom() {
         // TODO: Send forespørsel om å opprette et rom
         System.out.println("Send forespørsel om å opprette et rom");
+        Map<Object, Object> map = new HashMap<>();
+        map.put("query", "opprettRom");
+        map.put("rom", GuiKonstruktør.romnavn);
+        map.put("brukernavn", brukernavn);
+        try {
+            utStrøm.writeObject(map);
+            Map input = (Map) innStrøm.readObject();
+            if ((int) input.get("status") == 1) {
+                Rom.oppdaterListe((ArrayList<String>) input.get("romliste"));
+                System.out.println("Lagt til rom");
+            } else if ((int) input.get("status") == 0) {
+                System.out.println("Server klarte ikke behandle forespørsel om å hente romliste");
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            System.out.println("Feil oppstått ved opprettelse av nytt rom");
+        }
     }
+
     public static void hentRomListeFraServer() {
         System.out.println("Iverksetter henting av rom fra server");
         Map<Object, Object> map = new HashMap<>();
