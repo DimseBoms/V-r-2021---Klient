@@ -102,7 +102,7 @@ public class Tilkobling {
         Platform.runLater(() -> {
             Alert utilgjengeligBrukerAlert = new Alert(Alert.AlertType.ERROR);
             utilgjengeligBrukerAlert.setHeaderText("Brukernavn utilgjengelig");
-            utilgjengeligBrukerAlert.show();
+            utilgjengeligBrukerAlert.showAndWait();
             velgBrukernavnDialog();
         });
     }
