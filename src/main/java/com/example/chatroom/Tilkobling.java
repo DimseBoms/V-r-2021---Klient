@@ -26,7 +26,7 @@ public class Tilkobling {
                 socket = new Socket(HOST, PORT);
                 utStrøm = new ObjectOutputStream(socket.getOutputStream());
                 innStrøm = new ObjectInputStream(socket.getInputStream());
-                sjekkInnBruker(); // ER DET FØRSTE SOM MÅ SKJE. BRUKER FÅR LISTE MED ROM SOM RESPONS
+                velgBrukernavnDialog(); // ER DET FØRSTE SOM MÅ SKJE. BRUKER FÅR LISTE MED ROM SOM RESPONS
   //              opprettRom(); // REQUEST FRA BRUKER OM Å OPPRETTE NYTT ROM
             } catch (IOException e) {
                 e.printStackTrace();
@@ -66,7 +66,6 @@ public class Tilkobling {
     // Sjekker inn bruker på server og mottar romliste dersom innsjekking er OK
     // TODO: Må separere metoden og vente på brukernavn inn
     private void sjekkInnBruker() {
-        velgBrukernavnDialog();
         System.out.println("Starter sjekkInnBruker");
         Map<Object, Object> brukerMap = new HashMap<>();
         brukerMap.put("query", "sjekkInnBruker");
@@ -82,7 +81,7 @@ public class Tilkobling {
                 tempRomListe.forEach(Rom::new);
             } else if ((int) input.get("status") == 0) {
                 brukernavnIkkeTilgjengelig();
-                sjekkInnBruker();
+                velgBrukernavnDialog();
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -97,6 +96,7 @@ public class Tilkobling {
             inputdialog.showAndWait();
             Tilkobling.setBrukernavn(inputdialog.getEditor().getText());
             GuiKonstruktør.oppdaterBrukernavn();
+            sjekkInnBruker();
         });
     }
     private void brukernavnIkkeTilgjengelig() {
