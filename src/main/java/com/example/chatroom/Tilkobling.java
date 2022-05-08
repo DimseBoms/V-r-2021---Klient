@@ -1,6 +1,7 @@
 package com.example.chatroom;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextInputDialog;
 
@@ -41,26 +42,27 @@ public class Tilkobling {
      * Metode for å sende request om nytt rom (create) til server
      */
     protected void opprettRom() {
-        System.out.println("Starter metoden opprettRom");
-        Map<Object, Object> brukerMap = new HashMap<>();
-        brukerMap.put("query", "opprettRom");
-        brukerMap.put("brukernavn", brukernavn);
-        brukerMap.put("rom", brukernavn);
+        // TODO: Send forespørsel om å opprette et rom
+        System.out.println("Send forespørsel om å opprette et rom");
+    }
+    public static void hentRomListeFraServer() {
+        System.out.println("Iverksetter henting av rom fra server");
+        Map<Object, Object> map = new HashMap<>();
+        map.put("query", "hentRom");
         try {
-            utStrøm.writeObject(brukerMap);
-            System.out.println(brukerMap);
-            System.out.println("Sendt brukerMap");
+            utStrøm.writeObject(map);
+            System.out.println(map);
+            System.out.println("Sendt forespørsel om å hente rom");
             Map input = (Map) innStrøm.readObject();
             if ((int) input.get("status") == 1) {
-                ArrayList<String> tempRomListe = (ArrayList<String>) input.get("romliste");
+                Rom.oppdaterListe((ArrayList<String>) input.get("romliste"));
                 System.out.println("Lagt til rom");
-                tempRomListe.forEach(Rom::new);
             } else if ((int) input.get("status") == 0) {
-                System.out.println("Romnavn eksisterer allerede");
+                System.out.println("Server klarte ikke behandle forespørsel om å hente romliste");
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
-            System.out.println("Feil oppstått ved innsjekking av bruker");
+            System.out.println("Feil oppstått ved henting av romliste");
         }
     }
     // Sjekker inn bruker på server og mottar romliste dersom innsjekking er OK
