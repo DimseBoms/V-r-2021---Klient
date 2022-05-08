@@ -81,7 +81,6 @@ public class Tilkobling {
                 tempRomListe.forEach(Rom::new);
             } else if ((int) input.get("status") == 0) {
                 brukernavnIkkeTilgjengelig();
-                velgBrukernavnDialog();
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -104,6 +103,7 @@ public class Tilkobling {
             Alert utilgjengeligBrukerAlert = new Alert(Alert.AlertType.ERROR);
             utilgjengeligBrukerAlert.setHeaderText("Brukernavn utilgjengelig");
             utilgjengeligBrukerAlert.show();
+            velgBrukernavnDialog();
         });
     }
     public void lukkTilkobling() {
