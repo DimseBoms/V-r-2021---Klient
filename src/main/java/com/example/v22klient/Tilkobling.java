@@ -8,40 +8,50 @@ import java.util.HashMap;
 
 
 public class Tilkobling {
+    // Tilkoblingsvariabler
+    public final String IP = "localhost";
+    public final int PORT = 8000;
     // Etablerer variabler for ObjectStreams som vil bli benyttet til overføring av data mellom klient og tjener
     private Socket socket;
     private ObjectInputStream innStrøm;
     private ObjectOutputStream utStrøm;
     private Bruker bruker;
+    private boolean brukerLoggetInn = false;
 
     // Oppretter tilkobling
-    public Tilkobling(Socket socket) throws IOException {
+    public Tilkobling() throws IOException {
+        System.out.println("Forsøker å koble til");
         try {
-            this.socket = socket;
+            this.socket = new Socket(IP, PORT);
+            System.out.println("Koblet til tjener " + socket);
             this.utStrøm = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             // Forsøker å lukke strømmene
-            innStrøm.close();
             utStrøm.close();
             socket.close();
         }
     }
 
     // Logger inn bruker
-    public void leggInnBruker() {
+    public void loggInnBruker() {
         try {
             System.out.println("Startet leggInnBruker");
             // Oppretter og sender HashMap med brukerinfo
             HashMap<Object, Object> brukerMap = new HashMap<>();
             brukerMap.put("query", "loggInn");
-            brukerMap.put("brukernavn", bruker.getFornavn());
+            brukerMap.put("fornavn", bruker.getFornavn());
+            brukerMap.put("etternavn", bruker.getEtternavn());
             brukerMap.put("epost", bruker.getEpost());
             brukerMap.put("tlf", bruker.getTlf());
             utStrøm.writeObject(brukerMap);
+            System.out.println("Sender innloggingsforsøk til serveren " + brukerMap);
             // Tar imot og behandler svar fra tjeneren
             this.innStrøm = new ObjectInputStream(socket.getInputStream());
             HashMap<Object, Object> svar = (HashMap<Object, Object>) innStrøm.readObject();
-            System.out.println(svar.toString());
+            System.out.println("Svar fra tjener " + svar.toString());
+            if ((int) svar.get("feilkode") == 0) {
+                this.brukerLoggetInn = true;
+            }
         } catch (IOException e) {
             // Gracefully close everything.
             closeEverything(socket, innStrøm, utStrøm);
@@ -52,7 +62,7 @@ public class Tilkobling {
     // Overlastet metode for å oppdatere brukervariabel før kall på leggInnBruker()
     public void loggInnBruker(Bruker bruker) {
         this.bruker = bruker;
-        leggInnBruker();
+        loggInnBruker();
     }
 
     // Send data
@@ -77,4 +87,11 @@ public class Tilkobling {
         }
     }
 
+    public boolean brukerLoggetInn() {
+        return brukerLoggetInn;
+    }
+
+    public Bruker getBruker() {
+        return bruker;
+    }
 }

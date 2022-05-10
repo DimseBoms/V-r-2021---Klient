@@ -3,12 +3,14 @@ package com.example.v22klient;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,12 +24,23 @@ public class KontrollerGUI extends Application {
     public Pane lykkeHjulPane;
     FlowPane velgTallPane;
     VBox rekkePane;
+    static Tilkobling tilkobling;
+
+    // Oppretter tilkobling til tjener
+    public static void kobleTilTjener() {
+        try {
+            tilkobling = new Tilkobling();
+        } catch (IOException e) {
+            // TODO:
+            System.out.println("Klarte ikke koble til tjener\nMå lage feilhåndtering for feil ved tilkobling her");
+            throw new RuntimeException(e);
+        }
+    }
 
     public static ArrayList<Lottorekke> valgteRekker;
 
     @Override
     public void start(Stage stage) throws IOException {
-
         root.getChildren().add(KomponenterGUI.lagInnloggingPane());
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
@@ -40,19 +53,32 @@ public class KontrollerGUI extends Application {
         launch();
     }
 
-    public static void loggInn(String fNavn, String eNavn, String tlf, String epost){
-        //server godtar innlogging
-        boolean check = false;
-
-        if(kontrollerTlfNr(KomponenterGUI.telefonInput.getText()) && kontrollerEpost(KomponenterGUI.epostInput.getText()) &&
-                kontrollerNavn(KomponenterGUI.fNavnInput.getText()) && kontrollerNavn(KomponenterGUI.eNavnInput.getText())){
-            check = true;
-        }
-
-        if(check){
-            root.getChildren().clear();
-            root.getChildren().addAll(KomponenterGUI.lagLykkeHjulPane(), KomponenterGUI.lagVelgTallPane(34));
-
+    public static void loggInn(String fornavn, String etternavn, String tlf, String epost){
+        if(kontrollerTlfNr(tlf) && kontrollerEpost(epost) && kontrollerNavn(fornavn) && kontrollerNavn(etternavn)) {
+            // Kobler til tjener
+            if (tilkobling == null) kobleTilTjener();
+            // Oppretter statisk brukerobjekt på Tilkobling
+            tilkobling.loggInnBruker(new Bruker(fornavn, etternavn, epost, tlf));
+            // Sjekker om bruker ble suksessfullt logget inn
+            if (tilkobling.brukerLoggetInn()) {
+                // Viser hovedvindu
+                root.getChildren().clear();
+                root.getChildren().addAll(KomponenterGUI.lagLykkeHjulPane(), KomponenterGUI.lagVelgTallPane(34));
+                // Viser velkomstmelding
+                Alert utilgjengeligBrukerAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                utilgjengeligBrukerAlert.setHeaderText("Velkommen " + tilkobling.getBruker().getFornavn());
+                utilgjengeligBrukerAlert.showAndWait();
+            } else {
+                // Viser feilmelding ved innlogging
+                Alert utilgjengeligBrukerAlert = new Alert(Alert.AlertType.ERROR);
+                utilgjengeligBrukerAlert.setHeaderText("Manglende samsvar mellom epost og telefon");
+                utilgjengeligBrukerAlert.showAndWait();
+            }
+        } else {
+            // Viser feilmelding angående formattering
+            Alert utilgjengeligBrukerAlert = new Alert(Alert.AlertType.INFORMATION);
+            utilgjengeligBrukerAlert.setHeaderText("Sjekk formattering på innloggingsinformasjon");
+            utilgjengeligBrukerAlert.showAndWait();
         }
     }
 
