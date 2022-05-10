@@ -35,7 +35,7 @@ public class Tilkobling {
     // Logger inn bruker
     public void loggInnBruker() {
         try {
-            System.out.println("Startet leggInnBruker");
+            System.out.println("Startet loggInnBruker");
             // Oppretter og sender HashMap med brukerinfo
             HashMap<Object, Object> brukerMap = new HashMap<>();
             brukerMap.put("query", "loggInn");

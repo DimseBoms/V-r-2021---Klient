@@ -33,8 +33,8 @@ public class KontrollerGUI extends Application {
         try {
             tilkobling = new Tilkobling();
         } catch (IOException e) {
-            // TODO:
-            System.out.println("Klarte ikke koble til tjener\nMå lage feilhåndtering for feil ved tilkobling her");
+            // TODO: Må lage feilhåndtering for feil ved tilkobling her. Gjerne GUI Komponenter
+            System.out.println("Klarte ikke koble til tjener");
             throw new RuntimeException(e);
         }
     }
@@ -59,7 +59,7 @@ public class KontrollerGUI extends Application {
     public static void loggInn(String fornavn, String etternavn, String tlf, String epost){
         if(kontrollerTlfNr(tlf) && kontrollerEpost(epost) && kontrollerNavn(fornavn) && kontrollerNavn(etternavn)) {
             // Kobler til tjener
-            if (tilkobling == null) kobleTilTjener();
+            kobleTilTjener();
             // Oppretter statisk brukerobjekt på Tilkobling
             tilkobling.loggInnBruker(new Bruker(fornavn, etternavn, epost, tlf));
             // Sjekker om bruker ble suksessfullt logget inn
