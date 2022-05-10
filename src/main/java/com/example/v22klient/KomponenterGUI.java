@@ -71,10 +71,10 @@ public class KomponenterGUI {
 
         Label loggInnLbl = new Label("Logg inn");
         Button loggInnBtn = new Button("Logg inn");
-        telefonInput = new TextField();
-        epostInput = new TextField();
-        fNavnInput = new TextField();
-        eNavnInput = new TextField();
+        telefonInput = new TextField("12345678");
+        epostInput = new TextField("test@email.ts");
+        fNavnInput = new TextField("ForTest");
+        eNavnInput = new TextField("EtterTest");
 
         HBox navnBoks = new HBox(10);
         navnBoks.getChildren().addAll(new Label("Fornavn: "), fNavnInput, new Label("Etternavn"), eNavnInput);

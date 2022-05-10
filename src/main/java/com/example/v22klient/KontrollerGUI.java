@@ -65,7 +65,6 @@ public class KontrollerGUI extends Application {
             if (tilkobling.brukerLoggetInn()) {
                 // Viser hovedvindu
                 root.getChildren().clear();
-                root.getChildren().clear();
                 Button btnSpin = new Button("Spinn");
                 root.getChildren().addAll(KomponenterGUI.lagLykkeHjulPane(lykkeHjul), KomponenterGUI.lagVelgTallPane(feltAntall), btnSpin);
                 btnSpin.setOnAction( e -> {
