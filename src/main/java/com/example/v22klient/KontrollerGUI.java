@@ -63,7 +63,6 @@ public class KontrollerGUI extends Application {
             if (tilkobling.brukerLoggetInn()) {
                 // Viser hovedvindu
                 root.getChildren().clear();
-                root.getChildren().addAll(KomponenterGUI.lagLykkeHjulPane(), KomponenterGUI.lagVelgTallPane(34));
                 // Viser velkomstmelding
                 Alert utilgjengeligBrukerAlert = new Alert(Alert.AlertType.CONFIRMATION);
                 utilgjengeligBrukerAlert.setHeaderText("Velkommen " + tilkobling.getBruker().getFornavn());
