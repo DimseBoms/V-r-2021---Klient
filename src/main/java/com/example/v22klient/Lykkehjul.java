@@ -5,9 +5,6 @@ import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
@@ -15,11 +12,12 @@ import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextBoundsType;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.zip.CheckedOutputStream;
 
 public class Lykkehjul extends Pane {
     private static final double WIDTH = KontrollerGUI.WIDTH/2;
@@ -79,16 +77,23 @@ public class Lykkehjul extends Pane {
 
         //For-løkke for å plassere labels
         for (int i = 1; feltAntall>=i; i++) {
+            String nyi = "";
+            if (i<10) {
+                nyi = "0"+i;
+            } else {nyi = ""+i;}
             //Plassere nummer i hjulet
-            Label lblNummer = new Label(""+i);
-            lblNummer.setFont(Font.font("Arial", FontWeight.BOLD, WIDTH/20));
+            Text lblNummer = new Text(nyi);
+            Font fontTall = Font.font("Arial", FontWeight.BOLD, WIDTH / 20);
+            lblNummer.setFont(fontTall);
 
             //Kalkulerer hvor tallene skal være i feltet
             //Er også godet for å plassere labels midt i istedenfor nederst til venstre
-            lblNummer.setLayoutX((center-WIDTH/80)+ radius * Math.sin(i * (2 * Math.PI / feltAntall)));
-            lblNummer.setLayoutY((center-WIDTH/80)- radius * Math.cos(i * (2 * Math.PI / feltAntall)));
+            double widthOffset = lblNummer.getBoundsInLocal().getWidth();
+            double heightOffset = lblNummer.getBoundsInLocal().getHeight();
             lblNummer.setRotate(feltGraderStart);
-            lblNummer.setTextFill(Color.BLACK);
+            lblNummer.setLayoutX((center - widthOffset/2) + radius * Math.sin(i * (2 * Math.PI / feltAntall)));
+            lblNummer.setLayoutY((center + heightOffset/2) - radius * Math.cos(i * (2 * Math.PI / feltAntall)));
+            lblNummer.setFill(Color.BLACK);
 
             feltGraderStart = feltGraderStart + feltGrader;
             getChildren().add(lblNummer);
@@ -153,6 +158,7 @@ public class Lykkehjul extends Pane {
         sequentialTransition.play();
     }
 
+    //Metoder
     private void vinnerTall() {
         vinnerTall = new Random().nextInt(34);
         System.out.println(vinnerTall);
@@ -161,6 +167,13 @@ public class Lykkehjul extends Pane {
         double vinnerFelt = -feltGrader * (double)vinnerTall;
         vinnerFeltMin = vinnerFelt - 0.1;
         vinnerFeltMax = vinnerFelt + 0.1;
+    }
+    private double calculateTextOffsetX(String text, double fontSize) {
+        return ((text.length()) / 2) + fontSize * 0.5;
+    }
+
+    private double calculateTextOffsetY(double fontSize) {
+        return (fontSize / 2) - fontSize * 0.4;
     }
 
     //Get-Metoder
