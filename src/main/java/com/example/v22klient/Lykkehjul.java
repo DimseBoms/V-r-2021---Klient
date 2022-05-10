@@ -17,14 +17,19 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public class Lykkehjul extends Pane {
     private static final double WIDTH = KontrollerGUI.WIDTH/2;
     private static Color farge1 = Color.LIGHTYELLOW;
     private static Color farge2 = Color.CORAL;
+    private static ArrayList<Arc> listFelt;
     double radius = WIDTH / 2;
     private static double rotasjonSpeed = 10;
     private static double feltGrader, vinnerFeltMin, vinnerFeltMax;
     private static boolean minSpeed;
+    private static int vinnerTall;
     SequentialTransition sequentialTransition;
 
     public Lykkehjul(int feltAntall) {
@@ -40,6 +45,7 @@ public class Lykkehjul extends Pane {
         for (int i = 1; feltAntall>=i; i++) {
             //Lager en arc - Et arc er et felt
             Arc arcFelt = new Arc();
+            listFelt = new ArrayList<>();
 
             //Plassere nummer i hjulet
             Label lblNummer = new Label(""+i);
@@ -75,6 +81,7 @@ public class Lykkehjul extends Pane {
 
             //Oppdaterer gradene for neste felt
             feltGraderStart = feltGraderStart + feltGrader;
+            listFelt.add(arcFelt);
             getChildren().add(arcFelt);
             getChildren().add(lblNummer);
         }
@@ -100,6 +107,7 @@ public class Lykkehjul extends Pane {
             sequentialTransition.stop();
         }
     };
+
     public void spin() {
         sequentialTransition = new SequentialTransition();
         minSpeed = false;
@@ -115,7 +123,8 @@ public class Lykkehjul extends Pane {
     }
 
     public void vinnerTall() {
-        int vinnerTall = 20;
+        vinnerTall = new Random().nextInt(34);
+        System.out.println(vinnerTall);
         double vinnerFelt = -feltGrader * (double)vinnerTall;
         vinnerFeltMin = vinnerFelt - 0.1;
         vinnerFeltMax = vinnerFelt + 0.1;

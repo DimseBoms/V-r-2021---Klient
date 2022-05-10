@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -21,7 +22,8 @@ public class KontrollerGUI extends Application {
     public static final int WIDTH = 600;
     public static final int HEIGHT = 800;
     public static VBox root = new VBox();
-    public Pane lykkeHjulPane;
+    public static int feltAntall = 34;
+    public static Lykkehjul lykkeHjul = new Lykkehjul(feltAntall);
     FlowPane velgTallPane;
     VBox rekkePane;
     static Tilkobling tilkobling;
@@ -63,6 +65,12 @@ public class KontrollerGUI extends Application {
             if (tilkobling.brukerLoggetInn()) {
                 // Viser hovedvindu
                 root.getChildren().clear();
+                root.getChildren().clear();
+                Button btnSpin = new Button("Spinn");
+                root.getChildren().addAll(KomponenterGUI.lagLykkeHjulPane(lykkeHjul), KomponenterGUI.lagVelgTallPane(feltAntall), btnSpin);
+                btnSpin.setOnAction( e -> {
+                    lykkeHjul.spin();
+                } );
                 // Viser velkomstmelding
                 Alert utilgjengeligBrukerAlert = new Alert(Alert.AlertType.CONFIRMATION);
                 utilgjengeligBrukerAlert.setHeaderText("Velkommen " + tilkobling.getBruker().getFornavn());
