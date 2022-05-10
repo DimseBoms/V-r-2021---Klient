@@ -69,6 +69,7 @@ public class KontrollerGUI extends Application {
                 Button btnSpin = new Button("Spinn");
                 root.getChildren().addAll(KomponenterGUI.lagLykkeHjulPane(lykkeHjul), KomponenterGUI.lagVelgTallPane(feltAntall), btnSpin);
                 btnSpin.setOnAction( e -> {
+                    if (!lykkeHjul.getAktivSpin())
                     lykkeHjul.spin();
                 } );
                 // Viser velkomstmelding

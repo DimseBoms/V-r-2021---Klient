@@ -26,15 +26,17 @@ public class Lykkehjul extends Pane {
     private static Color farge1 = Color.LIGHTYELLOW;
     private static Color farge2 = Color.CORAL;
     private static ArrayList<Arc> listFelt = new ArrayList<>();;
-    double radius = WIDTH / 2;
+    private static final double radius = WIDTH / 2;
     private static double rotasjonSpeed = 10;
     private static double feltGrader, vinnerFeltMin, vinnerFeltMax;
-    private static boolean minSpeed;
+    private static boolean minSpeed, aktivSpin;
     private static int vinnerTall;
-    SequentialTransition sequentialTransition;
 
-    public Lykkehjul(int feltAntall) {
+    private static SequentialTransition sequentialTransition;
+
+    protected Lykkehjul(int feltAntall) {
         //Kalkulerer hvor mange grader hvert felt er
+        aktivSpin = false;
         feltGrader = 360/(double)feltAntall;
         double center = WIDTH/2;
         //Starter med
@@ -43,13 +45,10 @@ public class Lykkehjul extends Pane {
         this.setMaxSize(WIDTH, WIDTH);
         this.setMinSize(WIDTH, WIDTH);
 
+        //FOR-løkke for å plassere feltene
         for (int i = 1; feltAntall>=i; i++) {
             //Lager en arc - Et arc er et felt
             Arc arcFelt = new Arc();
-
-            //Plassere nummer i hjulet
-            Label lblNummer = new Label(""+i);
-            lblNummer.setFont(Font.font("Arial", FontWeight.BOLD, WIDTH/20));
 
             //Gir farge annenhver
             if (i % 2 == 0) {
@@ -67,6 +66,23 @@ public class Lykkehjul extends Pane {
             arcFelt.setType(ArcType.ROUND);
             arcFelt.setStroke(Color.BLACK);
 
+            //Oppdaterer gradene for neste felt
+            feltGraderStart = feltGraderStart + feltGrader;
+
+            //Plasserer feltene i Lykkehjul
+            listFelt.add(arcFelt);
+            getChildren().add(arcFelt);
+        }
+
+        //Resetter feltGraderStart
+        feltGraderStart = feltGrader;
+
+        //For-løkke for å plassere labels
+        for (int i = 1; feltAntall>=i; i++) {
+            //Plassere nummer i hjulet
+            Label lblNummer = new Label(""+i);
+            lblNummer.setFont(Font.font("Arial", FontWeight.BOLD, WIDTH/20));
+
             //Kalkulerer hvor tallene skal være i feltet
             //Er også godet for å plassere labels midt i istedenfor nederst til venstre
             lblNummer.setLayoutX((center-WIDTH/80)+ radius * Math.sin(i * (2 * Math.PI / feltAntall)));
@@ -74,41 +90,59 @@ public class Lykkehjul extends Pane {
             lblNummer.setRotate(feltGraderStart);
             lblNummer.setTextFill(Color.BLACK);
 
-            //Oppdaterer gradene for neste felt
             feltGraderStart = feltGraderStart + feltGrader;
-            listFelt.add(arcFelt);
             getChildren().add(lblNummer);
-            getChildren().add(arcFelt);
         }
         Circle midtSirklel = new Circle(center, center, radius /11, Color.GOLDENROD);
         midtSirklel.setStroke(Color.GAINSBORO);
         getChildren().add(midtSirklel);
     }
 
+    //Animasjon for å spinne hjulet
     EventHandler<ActionEvent> eventSpin = e -> {
-        double friksjonRotasjonSpeed = -0.001 * -rotasjonSpeed;
-        if (rotasjonSpeed > -0.03 && !minSpeed) {
-            minSpeed = true;
-        }
-        if (minSpeed) {
-            this.setRotate(this.getRotate() - 0.03);
+        //Kalkulerer hvor mye fart hjulet har mistet
+        double friksjonRotasjonSpeed = 0.001 * rotasjonSpeed;
+
+        //Kalkulerer hvor langt fra vinnerfeltet hjulet er
+        double distanseFraVFelt = this.getRotate() - vinnerFeltMin;
+
+        //Hvis at hjulet har truffet minimumspeed og distananse fra feltet er under 50, senk farten veldig
+        //else if minimumspeed er truffet, ha medium rask fart
+        //else farten er basert på friksjon og nåværende fart
+        if (minSpeed && distanseFraVFelt < 50 && distanseFraVFelt > 0) {
+            this.setRotate(this.getRotate() - 0.02);
+        } else if (minSpeed) {
+            this.setRotate(this.getRotate() - 0.05);
         } else {
             rotasjonSpeed = rotasjonSpeed - friksjonRotasjonSpeed;
-            this.setRotate(this.getRotate() + rotasjonSpeed);
+            this.setRotate(this.getRotate() - rotasjonSpeed);
         }
+
+        //Hvis at fart er mindre enn 0.07, mimimum fart er true
+        if (rotasjonSpeed < 0.07 && !minSpeed) {
+            minSpeed = true;
+        }
+
+        //Resett rotasjonen til innenfor 360 grader
         if (this.getRotate() < -360)
             this.setRotate(0);
+
+        //Hvis at hjulet er over riktig felt og minimumfart er truffet, avslutt rotasjonen
         if (this.getRotate() > vinnerFeltMin && this.getRotate() < vinnerFeltMax && minSpeed) {
             //Arc arc = listFelt.get(vinnerTall-1);
             //arc.setFill(Color.BLACK);
+            aktivSpin = false;
             sequentialTransition.stop();
         }
     };
 
-    public void spin() {
+    protected void spin() {
         sequentialTransition = new SequentialTransition();
+        aktivSpin = true;
         minSpeed = false;
-        rotasjonSpeed = -10;
+        rotasjonSpeed = 10;
+
+        //Finn vinnertallene
         vinnerTall();
 
         Timeline tmSpin = new Timeline(
@@ -119,11 +153,16 @@ public class Lykkehjul extends Pane {
         sequentialTransition.play();
     }
 
-    public void vinnerTall() {
-        vinnerTall = new Random().nextInt(10);
+    private void vinnerTall() {
+        vinnerTall = new Random().nextInt(34);
         System.out.println(vinnerTall);
+
+        //Kalkuler hva som er minst og høyeste rotasjonnivå
         double vinnerFelt = -feltGrader * (double)vinnerTall;
         vinnerFeltMin = vinnerFelt - 0.1;
         vinnerFeltMax = vinnerFelt + 0.1;
     }
+
+    //Get-Metoder
+    protected boolean getAktivSpin() {return aktivSpin;}
 }
