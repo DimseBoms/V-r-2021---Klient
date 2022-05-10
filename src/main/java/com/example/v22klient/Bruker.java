@@ -1,20 +1,29 @@
 package com.example.v22klient;
 
 public class Bruker {
-    String brukernavn, epost, tlf;
+    String fornavn, etternavn, epost, tlf;
 
-    public Bruker(String brukernavn, String epost, String tlf) {
-        this.brukernavn = brukernavn;
+    public Bruker(String fornavn, String etternavn, String epost, String tlf) {
+        this.fornavn = fornavn;
+        this.etternavn = etternavn;
         this.epost = epost;
         this.tlf = tlf;
     }
 
-    public String getBrukernavn() {
-        return brukernavn;
+    public String getFornavn() {
+        return fornavn;
     }
 
-    public void setBrukernavn(String brukernavn) {
-        this.brukernavn = brukernavn;
+    public void setFornavn(String fornavn) {
+        this.fornavn = fornavn;
+    }
+
+    public String getEtternavn() {
+        return etternavn;
+    }
+
+    public void setEtternavn(String etternavn) {
+        this.etternavn = etternavn;
     }
 
     public String getEpost() {
@@ -36,7 +45,7 @@ public class Bruker {
     @Override
     public String toString() {
         return "Bruker{" +
-                "brukernavn='" + brukernavn + '\'' +
+                "brukernavn='" + fornavn + '\'' +
                 ", epost='" + epost + '\'' +
                 ", tlf='" + tlf + '\'' +
                 '}';

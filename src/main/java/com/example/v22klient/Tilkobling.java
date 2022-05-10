@@ -34,7 +34,7 @@ public class Tilkobling {
             // Oppretter og sender HashMap med brukerinfo
             HashMap<Object, Object> brukerMap = new HashMap<>();
             brukerMap.put("query", "loggInn");
-            brukerMap.put("brukernavn", bruker.getBrukernavn());
+            brukerMap.put("brukernavn", bruker.getFornavn());
             brukerMap.put("epost", bruker.getEpost());
             brukerMap.put("tlf", bruker.getTlf());
             utStrøm.writeObject(brukerMap);
