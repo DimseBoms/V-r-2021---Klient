@@ -8,6 +8,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 
@@ -22,6 +25,7 @@ public class KomponenterGUI {
         double nålGrader = KontrollerGUI.WIDTH/6;
         Polygon nål = new Polygon(0, 0, (20 * Math.tan(nålGrader)), -nålLengde, -(nålLengde * Math.tan(nålGrader)), -nålLengde);
         nål.setFill(Color.DARKRED);
+        nål.setStroke(Color.BLACK);
         nål.setLayoutX(0);
         nål.setLayoutY(0);
         VBox stack = new VBox();
@@ -68,44 +72,45 @@ public class KomponenterGUI {
 
     //Innlogging
     public static VBox lagInnloggingPane(){
+        HBox tittelBox = new HBox();
+        tittelBox.setAlignment(Pos.CENTER);
+        tittelBox.setPadding(new Insets(40, 10, 10, 10));
+        Text lblDollarsymbol = new Text("$ ");
+        lblDollarsymbol.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+        lblDollarsymbol.setFill(Color.YELLOW);
+        lblDollarsymbol.setStroke(Color.BLACK);
+        Text loggInnLbl = new Text("WebLotto - Et spill for Norge");
+        loggInnLbl.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+        loggInnLbl.setFill(Color.WHITE);
+        tittelBox.getChildren().addAll(lblDollarsymbol, loggInnLbl);
 
-        Label loggInnLbl = new Label("Logg inn");
         Button loggInnBtn = new Button("Logg inn");
         telefonInput = new TextField("12345678");
         epostInput = new TextField("test@email.ts");
         fNavnInput = new TextField("ForTest");
         eNavnInput = new TextField("EtterTest");
 
-        HBox navnBoks = new HBox(10);
-        navnBoks.getChildren().addAll(new Label("Fornavn: "), fNavnInput, new Label("Etternavn"), eNavnInput);
+        VBox mainBoks = new VBox(10);
+        mainBoks.setAlignment(Pos.CENTER);
+        mainBoks.setMaxWidth(400);
+        mainBoks.setPadding(new Insets(20, 20, 20, 20));
+        mainBoks.setBackground(Background.fill(Color.WHITE));
 
-        HBox telefonBoks = new HBox(10);
-        telefonBoks.getChildren().addAll(new Label("Telefon: "), telefonInput);
-
-        HBox epostBoks = new HBox(10);
-        epostBoks.getChildren().addAll(new Label("Epost: "), epostInput);
+        mainBoks.getChildren().addAll(new Label("Fornavn"), fNavnInput, new Label("Etternavn"), eNavnInput);
+        mainBoks.getChildren().addAll(new Label("Telefon"), telefonInput);
+        mainBoks.getChildren().addAll(new Label("Epost"), epostInput);
 
         loggInnBtn.setOnAction( e -> {
             KontrollerGUI.loggInn(fNavnInput.getText(), eNavnInput.getText(), telefonInput.getText(), epostInput.getText());
         });
 
         VBox loggInnPane = new VBox(20);
-        loggInnPane.getChildren().addAll(loggInnLbl, navnBoks, telefonBoks, epostBoks, loggInnBtn);
+        loggInnPane.getChildren().addAll(tittelBox, mainBoks, loggInnBtn);
+        loggInnPane.setBackground(new Background(new BackgroundFill(Color.DARKSLATEGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+        loggInnPane.setAlignment(Pos.CENTER);
 
         return loggInnPane;
     }
-    static Polygon createTriangle(Point2D origin, double length, double angle){
-        Polygon fovTriangle = new Polygon(
-                0d, 0d,
-                (length * Math.tan(angle)), -length,
-                -(length * Math.tan(angle)), -length
-        );
-        fovTriangle.setFill(Color.DARKRED);
-        fovTriangle.setLayoutX(origin.getX());
-        fovTriangle.setLayoutY(origin.getY());
-        return fovTriangle;
-    }
-
     //gevinst-visning
 
 

@@ -19,12 +19,13 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.zip.CheckedOutputStream;
 
 public class Lykkehjul extends Pane {
     private static final double WIDTH = KontrollerGUI.WIDTH/2;
     private static Color farge1 = Color.LIGHTYELLOW;
     private static Color farge2 = Color.CORAL;
-    private static ArrayList<Arc> listFelt;
+    private static ArrayList<Arc> listFelt = new ArrayList<>();;
     double radius = WIDTH / 2;
     private static double rotasjonSpeed = 10;
     private static double feltGrader, vinnerFeltMin, vinnerFeltMax;
@@ -45,23 +46,10 @@ public class Lykkehjul extends Pane {
         for (int i = 1; feltAntall>=i; i++) {
             //Lager en arc - Et arc er et felt
             Arc arcFelt = new Arc();
-            listFelt = new ArrayList<>();
 
             //Plassere nummer i hjulet
             Label lblNummer = new Label(""+i);
             lblNummer.setFont(Font.font("Arial", FontWeight.BOLD, WIDTH/20));
-
-            //Kalkulerer hvor tallene skal være i feltet
-            //Er også godet for å plassere labels midt i istedenfor nederst til venstre
-            lblNummer.setLayoutX((center-WIDTH/80)+ radius *Math.sin(i * (2 * Math.PI / feltAntall)));
-            lblNummer.setLayoutY((center-WIDTH/80)- radius *Math.cos(i * (2 * Math.PI / feltAntall)));
-            lblNummer.setRotate(feltGraderStart);
-            lblNummer.setMaxWidth(Double.MAX_VALUE);
-            AnchorPane.setLeftAnchor(lblNummer, 0.0);
-            AnchorPane.setRightAnchor(lblNummer, 0.0);
-            lblNummer.setAlignment(Pos.CENTER);
-
-            //Oppdaterer gradene for neste felt
 
             //Gir farge annenhver
             if (i % 2 == 0) {
@@ -79,11 +67,18 @@ public class Lykkehjul extends Pane {
             arcFelt.setType(ArcType.ROUND);
             arcFelt.setStroke(Color.BLACK);
 
+            //Kalkulerer hvor tallene skal være i feltet
+            //Er også godet for å plassere labels midt i istedenfor nederst til venstre
+            lblNummer.setLayoutX((center-WIDTH/80)+ radius * Math.sin(i * (2 * Math.PI / feltAntall)));
+            lblNummer.setLayoutY((center-WIDTH/80)- radius * Math.cos(i * (2 * Math.PI / feltAntall)));
+            lblNummer.setRotate(feltGraderStart);
+            lblNummer.setTextFill(Color.BLACK);
+
             //Oppdaterer gradene for neste felt
             feltGraderStart = feltGraderStart + feltGrader;
             listFelt.add(arcFelt);
-            getChildren().add(arcFelt);
             getChildren().add(lblNummer);
+            getChildren().add(arcFelt);
         }
         Circle midtSirklel = new Circle(center, center, radius /11, Color.GOLDENROD);
         midtSirklel.setStroke(Color.GAINSBORO);
@@ -104,6 +99,8 @@ public class Lykkehjul extends Pane {
         if (this.getRotate() < -360)
             this.setRotate(0);
         if (this.getRotate() > vinnerFeltMin && this.getRotate() < vinnerFeltMax && minSpeed) {
+            //Arc arc = listFelt.get(vinnerTall-1);
+            //arc.setFill(Color.BLACK);
             sequentialTransition.stop();
         }
     };
@@ -123,7 +120,7 @@ public class Lykkehjul extends Pane {
     }
 
     public void vinnerTall() {
-        vinnerTall = new Random().nextInt(34);
+        vinnerTall = new Random().nextInt(10);
         System.out.println(vinnerTall);
         double vinnerFelt = -feltGrader * (double)vinnerTall;
         vinnerFeltMin = vinnerFelt - 0.1;
