@@ -27,6 +27,7 @@ public class KontrollerGUI extends Application {
     FlowPane velgTallPane;
     VBox rekkePane;
     static Tilkobling tilkobling;
+    static Bruker bruker;
 
     // Oppretter tilkobling til tjener
     public static void kobleTilTjener() {
@@ -61,7 +62,8 @@ public class KontrollerGUI extends Application {
             // Kobler til tjener
             kobleTilTjener();
             // Oppretter statisk brukerobjekt på Tilkobling
-            tilkobling.loggInnBruker(new Bruker(fornavn, etternavn, epost, tlf));
+            bruker = new Bruker(fornavn, etternavn, epost, tlf);
+            tilkobling.loggInnBruker(bruker);
             // Sjekker om bruker ble suksessfullt logget inn
             if (tilkobling.brukerLoggetInn()) {
                 // Viser hovedvindu
@@ -71,6 +73,7 @@ public class KontrollerGUI extends Application {
                 btnSpin.setOnAction( e -> {
                     lykkeHjul.spin();
                 } );
+                testSendingAvRekke(bruker);
                 // Viser velkomstmelding
                 Alert utilgjengeligBrukerAlert = new Alert(Alert.AlertType.CONFIRMATION);
                 utilgjengeligBrukerAlert.setHeaderText("Velkommen " + tilkobling.getBruker().getFornavn());
@@ -87,6 +90,19 @@ public class KontrollerGUI extends Application {
             utilgjengeligBrukerAlert.setHeaderText("Sjekk formattering på innloggingsinformasjon");
             utilgjengeligBrukerAlert.showAndWait();
         }
+    }
+
+    private static void testSendingAvRekke(Bruker bruker) {
+        ArrayList<Integer> rekkeMedTall = new ArrayList<>();
+        rekkeMedTall.add(69);
+        rekkeMedTall.add(69);
+        rekkeMedTall.add(69);
+        rekkeMedTall.add(69);
+        rekkeMedTall.add(12);
+        rekkeMedTall.add(42);
+        rekkeMedTall.add(12);
+        Rekke rekke= new Rekke(rekkeMedTall, 5, bruker);
+        tilkobling.sendRekke(bruker);
     }
 
     /**

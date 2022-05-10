@@ -1,16 +1,24 @@
 package com.example.v22klient;
 
-import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Rekke {
-    final static int LENGDE = 6;
-    Array[] rekke;
-    int sats;
+    public ArrayList<Integer> tallRekke;
+    public int innsats;
+    protected double gevinst;
 
-    public Rekke(Array[] rekke, int sats) {
-        if (rekke.length == 6) {
-            this.rekke = rekke;
-            this.sats = sats;
-        } else throw new IllegalArgumentException("Rekke-objekt må ha syv verdier i rekka.");
+
+    public Rekke(ArrayList<Integer>rekkeMedTall, int rekkePris, Bruker bruker) {
+
+        this.tallRekke = new ArrayList<>(rekkeMedTall);
+        Collections.sort(tallRekke);
+        this.innsats= rekkePris;
+        bruker.innsatsListe.add(this.innsats);
+        bruker.rekkeListe.add(this.tallRekke);
+    }
+
+    public void setGevinst(double gevinst) {
+        this.gevinst = gevinst;
     }
 }

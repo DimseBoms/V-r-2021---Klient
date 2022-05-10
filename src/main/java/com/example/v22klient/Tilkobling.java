@@ -66,8 +66,34 @@ public class Tilkobling {
     }
 
     // Send data
-    public void sendRekke() {
-        System.out.println("Har ikke laget sendRekke()");
+    public void sendRekke(Bruker bruker) {
+
+
+        try {
+
+            // Oppretter og sender HashMap med bruker sine rekker
+
+            HashMap<Object, Object> brukerMap = new HashMap<>();
+
+            brukerMap.put("query", "sendRekke");
+            brukerMap.put("rekker", bruker.rekkeListe);
+            brukerMap.put("innsats", bruker.innsatsListe);
+            utStrøm.writeObject(brukerMap);
+
+
+            System.out.println("starter å sende rekke");
+
+            // Tar imot og behandler svar fra tjeneren
+            this.innStrøm = new ObjectInputStream(socket.getInputStream());
+            HashMap<Object, Object> svar = (HashMap<Object, Object>) innStrøm.readObject();
+            System.out.println(svar.toString());
+        } catch (IOException e) {
+            // Gracefully close everything.
+            closeEverything(socket, innStrøm, utStrøm);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     // Hjelpemetode for å lukke alle åpne strømmer og sockets
