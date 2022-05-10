@@ -1,13 +1,19 @@
 package com.example.v22klient;
 
+import java.util.ArrayList;
+
 public class Bruker {
-    String fornavn, etternavn, epost, tlf;
+    protected  ArrayList<ArrayList<Integer>> rekkeListe;
+    protected ArrayList<Integer> innsatsListe;
+    protected String fornavn, etternavn, epost, tlf;
 
     public Bruker(String fornavn, String etternavn, String epost, String tlf) {
         this.fornavn = fornavn;
         this.etternavn = etternavn;
         this.epost = epost;
         this.tlf = tlf;
+        this.rekkeListe = new ArrayList<>();
+        this.innsatsListe = new ArrayList<>();
     }
 
     public String getFornavn() {
