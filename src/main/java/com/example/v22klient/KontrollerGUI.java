@@ -2,10 +2,18 @@ package com.example.v22klient;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Arc;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -18,8 +26,9 @@ import java.util.regex.Pattern;
 public class KontrollerGUI extends Application {
     public static final int WIDTH = 600;
     public static final int HEIGHT = 800;
+    public static int feltAntall = 34;
     public static VBox root = new VBox();
-    public Pane lykkeHjulPane;
+    public static Lykkehjul lykkeHjul = new Lykkehjul(34);
     FlowPane velgTallPane;
     VBox rekkePane;
 
@@ -42,7 +51,7 @@ public class KontrollerGUI extends Application {
 
     public static void loggInn(String fNavn, String eNavn, String tlf, String epost){
         //server godtar innlogging
-        boolean check = false;
+        boolean check = true;
 
         if(kontrollerTlfNr(KomponenterGUI.telefonInput.getText()) && kontrollerEpost(KomponenterGUI.epostInput.getText()) &&
                 kontrollerNavn(KomponenterGUI.fNavnInput.getText()) && kontrollerNavn(KomponenterGUI.eNavnInput.getText())){
@@ -51,8 +60,11 @@ public class KontrollerGUI extends Application {
 
         if(check){
             root.getChildren().clear();
-            root.getChildren().addAll(KomponenterGUI.lagLykkeHjulPane(), KomponenterGUI.lagVelgTallPane(34));
-
+            Button btnSpin = new Button("Spinn");
+            root.getChildren().addAll(KomponenterGUI.lagLykkeHjulPane(lykkeHjul), KomponenterGUI.lagVelgTallPane(feltAntall), btnSpin);
+            btnSpin.setOnAction( e -> {
+                lykkeHjul.spin();
+            } );
         }
     }
 
@@ -92,5 +104,4 @@ public class KontrollerGUI extends Application {
         }
         System.out.println(KomponenterGUI.rekkeTall);
     }
-
 }

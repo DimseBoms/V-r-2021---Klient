@@ -1,11 +1,13 @@
 package com.example.v22klient;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Polygon;
 
 import java.util.ArrayList;
 
@@ -15,12 +17,20 @@ public class KomponenterGUI {
     public static ArrayList<ToggleButton> tallKnapperListe;
     public static ArrayList<Integer> rekkeTall;
 
-    public static Pane lagLykkeHjulPane(){
-        Pane lykkeHjulPane = new Pane();
-        Circle lykkehjul = new Circle(KontrollerGUI.WIDTH / 2, KontrollerGUI.HEIGHT / 8, 100);
-        lykkeHjulPane.getChildren().add(lykkehjul);
-
-        return lykkeHjulPane;
+    public static VBox lagLykkeHjulPane(Lykkehjul lykkeHjul){
+        double nålLengde = KontrollerGUI.WIDTH/30;
+        double nålGrader = KontrollerGUI.WIDTH/6;
+        Polygon nål = new Polygon(0, 0, (20 * Math.tan(nålGrader)), -nålLengde, -(nålLengde * Math.tan(nålGrader)), -nålLengde);
+        nål.setFill(Color.DARKRED);
+        nål.setLayoutX(0);
+        nål.setLayoutY(0);
+        VBox stack = new VBox();
+        stack.getChildren().addAll(nål, lykkeHjul);
+        stack.setBackground(new Background(new BackgroundFill(Color.DARKSLATEGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+        stack.setAlignment(Pos.CENTER);
+        stack.setPadding(new Insets(50));
+        stack.setSpacing(25);
+        return stack;
     }
 
     public static FlowPane lagVelgTallPane(int antallTall){
@@ -83,6 +93,17 @@ public class KomponenterGUI {
         loggInnPane.getChildren().addAll(loggInnLbl, navnBoks, telefonBoks, epostBoks, loggInnBtn);
 
         return loggInnPane;
+    }
+    static Polygon createTriangle(Point2D origin, double length, double angle){
+        Polygon fovTriangle = new Polygon(
+                0d, 0d,
+                (length * Math.tan(angle)), -length,
+                -(length * Math.tan(angle)), -length
+        );
+        fovTriangle.setFill(Color.DARKRED);
+        fovTriangle.setLayoutX(origin.getX());
+        fovTriangle.setLayoutY(origin.getY());
+        return fovTriangle;
     }
 
     //gevinst-visning
