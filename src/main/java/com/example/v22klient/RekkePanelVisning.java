@@ -6,6 +6,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;
 
@@ -14,29 +18,108 @@ public class RekkePanelVisning extends HBox {
     protected int rammeId = 1;
     protected static ArrayList<RekkePanelVisning> rammer = new ArrayList<>();
     private Button slettRekkePanel;
-    private TextField innsats;
+    private static TextField innsats;
     private int kronerSatset;
     private StackPane stackPane;
     private Label label;
     private final int BREDDE = 60;
-
+    private static int samletInnsats = 0;
+    static double total;
 
     public RekkePanelVisning() {
         this.setSpacing(15);
         this.label = new Label();
-        label.setText("Rekke " + antallRekker++); // 1 byttes ut med klassevariabel som itereres med ++
+        this.label.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        this.label.setTextFill(Color.WHITE);
+        this.label.setText("Rekke " + antallRekker++);
+        this.label.setTextAlignment(TextAlignment.CENTER);
         this.stackPane = new StackPane(this.label);
-        this.stackPane.setAlignment(Pos.BOTTOM_CENTER);
         this.slettRekkePanel = new Button("Slett");
         this.slettRekkePanel.setPrefWidth(BREDDE);
         this.innsats = new TextField();
         this.innsats.setPrefWidth(BREDDE);
         this.innsats.setPromptText("Innsats");
-        this.getChildren().addAll(label, slettRekkePanel, innsats);
+
+   //     this.innsats.setOnAction(e-> {
+  //          if (Double.parseDouble(innsats.getText()) == 0) {
+   //             total += Double.parseDouble(innsats.getText());
+ //               System.out.println(total);
+ //           }
+  //      });
+      //  this.innsats.setOnKeyTyped(e-> {
+     //       aggregerInnsats();
+      //      System.out.println("Aggregerer");
+     //   });
+        this.getChildren().addAll(stackPane, slettRekkePanel, innsats);
         this.lyttPåSlettRekkePanel();
-        this.lyttPåInnsats();
+    //    this.lyttPåInnsats();
         this.rammeId++;
         this.rammer.add(this);
+    }
+
+    /**
+     * Konstruktør som tar inn en ArrayList av int[]
+     * Bygger opp visning av rekker fra fil
+     * @param rekkerFraFil
+     */
+    public RekkePanelVisning(ArrayList<int[]> rekkerFraFil) {
+        this.setSpacing(15);
+        this.label = new Label();
+        this.label.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        this.label.setTextFill(Color.WHITE);
+        this.label.setText("Rekke " + antallRekker++);
+        this.label.setTextAlignment(TextAlignment.CENTER);
+        this.stackPane = new StackPane(this.label);
+        this.slettRekkePanel = new Button("Slett");
+        this.slettRekkePanel.setPrefWidth(BREDDE);
+        this.innsats = new TextField();
+        this.innsats.setPrefWidth(BREDDE);
+        this.innsats.setPromptText("Innsats");
+        this.getChildren().addAll(stackPane, slettRekkePanel, innsats);
+        int teller = 0;
+
+        for(int[] liste : rekkerFraFil){
+            for(int i = 0; i < 1; i++){
+                this.getChildren().add(new TallTrekkVisning(liste[i]));
+            }
+    //        pane.add(rekkeVisning)
+        }
+
+ //       for (int[] tall : rekkerFraFil) {
+//            int siffer = tall[teller];
+ //           teller++;
+ //           this.getChildren().add(new TallTrekkVisning(siffer));
+  //      }
+
+
+    }
+
+    public static double hentInnsats() {
+        for (RekkePanelVisning r : rammer) {
+            if (!innsats.getText().equals(""))
+                total += r.getInnsats();
+        }
+        System.out.println(total);
+        return total;
+    }
+
+    public double getInnsats() {
+        return Double.parseDouble(innsats.getText());
+    }
+/*
+    protected static double aggregerInnsats() {
+        for (RekkePanelVisning r : rammer) {
+            total += r.getInnsats();
+        }
+        System.out.println(total);
+        return total;
+
+    }
+
+
+ */
+    protected static double aggregerInnsats() {
+        return total;
 
     }
 

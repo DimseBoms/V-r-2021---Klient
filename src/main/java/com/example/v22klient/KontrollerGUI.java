@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -56,6 +57,7 @@ public class KontrollerGUI extends Application {
 
     public static ArrayList<Lottorekke> valgteRekker;
 
+
     @Override
     public void start(Stage stage) throws IOException {
         root.setBackground(new Background(new BackgroundFill(Color.DARKSLATEGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -82,20 +84,17 @@ public class KontrollerGUI extends Application {
             if (tilkobling.brukerLoggetInn()) {
                 // Viser hovedvindu
                 root.getChildren().clear();
-                Button btnSpin = new Button("Spinn");
                 rekkeRamme = new VBox();
                 rekkeRamme.setPadding(new Insets(10));
+                rekkeRamme.setSpacing(5);
                 root.getChildren().addAll(
                         menyBar(),
-                        KomponenterGUI.lagLykkeHjulPane(lykkeHjul),
-                        KomponenterGUI.lagVelgTallPane(feltAntall),
-                        btnSpin,
-                        rekkeRamme
+            //            visSummering(),
+            //            KomponenterGUI.lagLykkeHjulPane(lykkeHjul),
+                        KomponenterGUI.lagVelgInputPane()
+            //            KomponenterGUI.lagVelgTallPane(feltAntall),
+            //            rekkeRamme
                 );
-                btnSpin.setOnAction( e -> {
-                    if (!lykkeHjul.getAktivSpin())
-                    lykkeHjul.spin();
-                } );
                 //testSendingAvRekke(bruker);
                 // Viser velkomstmelding
                 Alert utilgjengeligBrukerAlert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -161,8 +160,11 @@ public class KontrollerGUI extends Application {
                 }
             }
             if(KomponenterGUI.rekkeTall.size() == 7){
-                // TODO: Tekst for rekker: Text, Font, Farge
-                // TODO: Når full rekke: untoggle alle valgte toggleButtons (toggle bør gi fargebytte knapper)
+                KomponenterGUI.resetToggle();
+                KomponenterGUI.rekkeTall.clear();
+                KomponenterGUI.toggleTeller = 0;
+                // OK TODO: Tekst for rekker: Text, Font, Farge
+                // OK TODO: Når full rekke: untoggle alle valgte toggleButtons (toggle bør gi fargebytte knapper)
                 // TODO: VINNERTALL SAMMENLIGNES MOT ALLE TALL, UAVHENGIG AV REKKE OG REKKEFØLGE
                 // TODO: match på vinnertall = grønne kuler
                 // TODO: Total innsats pr spill må summeres og vises + TOTAL PREMIE
@@ -186,13 +188,25 @@ public class KontrollerGUI extends Application {
                 // TODO: I RAPPORT: HVA MED MOBILE ENHETER?
                 // TODO: RAPPORT I PDF (VALFRITT): KLASSEDIAGRAM
                 //   KomponenterGUI.tallKnapperListe.get(k).setSelected(false);
-                KomponenterGUI.rekkeTall.clear();
-                KomponenterGUI.toggleTeller = 0;
+
             }
         }
         trekkTall2();
         rekkeRamme.setStyle("-fx-background-color: dimgrey");
         System.out.println(KomponenterGUI.rekkeTall);
+    }
+
+    private static void filVisning() {
+        KomponenterGUI.lagLastOppFilPane();
+        root.getChildren().clear();
+        root.getChildren().addAll(
+                menyBar(),
+                visSummering(),
+                KomponenterGUI.lagLykkeHjulPane(lykkeHjul),
+                KomponenterGUI.lagVelgInputPane(),
+        //        KomponenterGUI.lagVelgTallPane(feltAntall),
+                rekkeRamme
+        );
     }
 
     /**
@@ -276,8 +290,11 @@ public class KontrollerGUI extends Application {
 
         miA0.setOnAction(e-> lykkeHjul.spin());
         miA1.setOnAction(e-> velgTall(34) );
-        miA2.setOnAction(e-> oppdaterSum(1, 999));
-        miA3.setOnAction(e-> oppdaterSum(2, 999));
+        miA2.setOnAction(e-> {
+
+            oppdaterSum(1, RekkePanelVisning.hentInnsats());
+        });
+//        miA3.setOnAction(e-> oppdaterSum(2, RekkePanelVisning.aggregerInnsats()));
 
         meny1.getItems().addAll(miA0, miA1, miA2, miA3);
 
@@ -285,9 +302,21 @@ public class KontrollerGUI extends Application {
         return mb;
     }
 
-    public static ArrayList<int[]> lesFil(){
+    public static void visVelgSelv() {
+        root.getChildren().clear();
+        root.getChildren().addAll(
+                menyBar(),
+                visSummering(),
+                KomponenterGUI.lagLykkeHjulPane(lykkeHjul),
+                KomponenterGUI.lagVelgTallPane(feltAntall),
+                rekkeRamme
+        );
+    }
+
+
+    public static ArrayList<int[]> lesFil (String filnavn) {
         ArrayList<int[]> rekker = new ArrayList<>();
-        File fil = new File(KomponenterGUI.filNavn);
+        File fil = new File(filnavn);
         int antallRekker = 0;
 
         try {
@@ -333,7 +362,7 @@ public class KontrollerGUI extends Application {
             }
         }
         System.out.println(rekker);
-
+        root.getChildren().add(new RekkePanelVisning(rekker));
         return rekker;
     }
 

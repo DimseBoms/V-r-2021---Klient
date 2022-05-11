@@ -19,13 +19,13 @@ import java.util.ArrayList;
 
 public class KomponenterGUI {
 
-    public static TextField telefonInput, epostInput, fNavnInput, eNavnInput;
+    public static TextField telefonInput, epostInput, fNavnInput, eNavnInput, lastOppFilNavnInput;
     public static ArrayList<ToggleButton> tallKnapperListe;
     public static ArrayList<Integer> rekkeTall;
     protected static int toggleTeller = 0;
-    public static Button velgSelv, lastOppFil, lastOpp;
+    public static Button velgSelv, lastOppFil, lastOpp, velgFil, angre;
     public static String filNavn;
-    public static VBox velgInputPane;
+    public static HBox velgInputPane;
 
     public static VBox lagLykkeHjulPane(Lykkehjul lykkeHjul){
         double nålLengde = KontrollerGUI.WIDTH/30;
@@ -46,27 +46,39 @@ public class KomponenterGUI {
 
     public static FlowPane lagVelgTallPane(int antallTall){
         FlowPane velgtallPane = new FlowPane();
+        velgtallPane.setPadding(new Insets(0,0,10,0));
+        velgtallPane.setVgap(5);
+        velgtallPane.setHgap(5);
+        velgtallPane.setAlignment(Pos.CENTER);
         tallKnapperListe = new ArrayList<>();
         rekkeTall = new ArrayList<>();
         //ToggleGroup group = new ToggleGroup();
 
         for(int i = 0; i < antallTall; i++){
             ToggleButton velgTallKnapp = new ToggleButton("" + (i + 1));
+            velgTallKnapp.setPrefWidth(30);
             velgTallKnapp.setOnAction( e -> {
+                velgTallKnapp.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE,null,null)));
                 KontrollerGUI.velgTall(antallTall);
                 // TODO: her skal vi sende tallet fra knappen til kula
                 toggleTeller++;
             });
             tallKnapperListe.add(velgTallKnapp);
         }
-
         for(ToggleButton b : tallKnapperListe){
             velgtallPane.getChildren().add(b);
         }
-
-
         return velgtallPane;
     }
+
+    public static void resetToggle() {
+        for (ToggleButton tb : tallKnapperListe) {
+            tb.setSelected(false);
+            tb.setBackground(new Background(new BackgroundFill(Color.LIGHTGREY,null,null)));
+
+        }
+    }
+
 
     public VBox lagRekkePane(){
         VBox rekkePane = new VBox();
@@ -121,49 +133,49 @@ public class KomponenterGUI {
         return loggInnPane;
     }
 
-    public static VBox lagVelgInputPane(){
-        velgInputPane = new VBox();
+    public static HBox lagVelgInputPane(){
+        velgInputPane = new HBox();
+        velgInputPane.setPadding(new Insets(10));
+        velgInputPane.setSpacing(10);
+        velgInputPane.setAlignment(Pos.CENTER);
         velgSelv = new Button("Velg tall selv");
+        velgSelv.setPrefWidth(200);
         velgSelv.setOnAction( event ->{
-            System.out.println("Vis tallknapper osv");
-            KontrollerGUI.root.getChildren().remove(velgInputPane);
-            KontrollerGUI.root.getChildren().add(lagVelgTallPane(34));
+            KontrollerGUI.visVelgSelv();
         });
 
         lastOppFil = new Button("Last opp rekker fra fil");
-        lastOppFil.setOnAction( event -> {
+        lastOppFil.setPrefWidth(200);
+        lastOppFil.setOnAction( e -> {
             lagLastOppFilPane();
         });
-
         velgInputPane.getChildren().addAll(velgSelv, lastOppFil);
         return velgInputPane;
     }
 
+    /**
+     * GIR NULLPOINTER DERSOM BRUKER AVBRYTER. BØR HA BEDRE UNNTAKSHÅNDTERING
+     */
     public static void lagLastOppFilPane(){
+        velgInputPane.getChildren().clear();
+        lastOppFilNavnInput = new TextField();
+        velgFil = new Button("bla gjennom");
+        velgFil.setOnAction( e -> {
+            FileChooser fileChooser = new FileChooser();
+            filNavn = fileChooser.showOpenDialog(new Stage()).toString();
+            lastOppFilNavnInput.setText(filNavn);
+        });
+        angre = new Button("Gå tilbake");
+        angre.setOnAction(e-> {
+            velgInputPane.getChildren().clear();
+            velgInputPane.getChildren().addAll(lagVelgInputPane());
+        });
         lastOpp = new Button("Last opp");
         lastOpp.setOnAction( event -> {
-            KontrollerGUI.lesFil();
-            velgInputPane.getChildren().clear();
+            KontrollerGUI.lesFil(filNavn);
         });
 
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Velg filen du vil laste opp");
-
-        File file = fileChooser.showOpenDialog(new Stage());
-
-
-        if(file != null) {
-            velgInputPane.getChildren().clear();
-            filNavn = file.toString();
-            Label lbl = new Label(filNavn);
-            lbl.setTextFill(Color.WHITE);
-            Button lastOppNy = new Button("Velg ny fil");
-            lastOppNy.setOnAction( event -> {
-                velgInputPane.getChildren().clear();
-                lagLastOppFilPane();
-            });
-            velgInputPane.getChildren().addAll(lbl, lastOpp, lastOppNy);
-        }
+        velgInputPane.getChildren().addAll(velgFil, lastOpp, angre, lastOppFilNavnInput);
 
     }
 

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class TallTrekkVisning extends HBox {
     private Circle sirkel;
     private Text tallNode;
-    private final int RADIUS = 15;
+    private final int RADIUS = 13;
     private StackPane stackPane;
     private int rekkeNr = 0;
     private boolean tilSletting;
