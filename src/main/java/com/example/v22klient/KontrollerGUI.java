@@ -124,7 +124,7 @@ public class KontrollerGUI extends Application {
         rekkeMedTall.add(12);
         rekkeMedTall.add(42);
         rekkeMedTall.add(12);
-        Rekke rekke= new Rekke(rekkeMedTall, 5, bruker);
+        //Rekke rekke= new Rekke(rekkeMedTall, 5, bruker);
         //tilkobling.sendRekke(bruker);
     }
 

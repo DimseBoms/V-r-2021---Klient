@@ -33,11 +33,13 @@ public class Lykkehjul extends Pane {
     private static double feltGrader, vinnerFeltMin, vinnerFeltMax;
     private static boolean minSpeed, aktivSpin;
     private static int vinnerTall;
+    private static int feltAntall;
 
     private static SequentialTransition sequentialTransition;
 
     protected Lykkehjul(int feltAntall) {
         //For å sjekke om hjulet er i spill
+        this.feltAntall = feltAntall;
         aktivSpin = false;
 
         //Kalkulerer hvor mange grader hvert felt er
@@ -111,31 +113,31 @@ public class Lykkehjul extends Pane {
     }
 
     //Animasjon for å spinne hjulet
+    //Vinnertallet er allerede trukket før hjulet starter å spinne
     EventHandler<ActionEvent> eventSpin = e -> {
         //Kalkulerer hvor mye fart hjulet har mistet
-        double friksjonRotasjonSpeed = 0.001 * rotasjonSpeed;
+        double friksjonRotasjonSpeed = 0;
 
         //Kalkulerer hvor langt fra vinnerfeltet hjulet er
         double distanseFraVFelt = this.getRotate() - vinnerFeltMin;
+        friksjonRotasjonSpeed = 0.001 * rotasjonSpeed;
 
-        //Hvis at hjulet har truffet minimumspeed og distananse fra feltet er under 50, senk farten veldig
-        //else if minimumspeed er truffet, ha medium rask fart
-        //else farten er basert på friksjon og nåværende fart
-        if (minSpeed && distanseFraVFelt < 50 && distanseFraVFelt > 0) {
-            this.setRotate(this.getRotate() - 0.02);
-        } else if (minSpeed) {
-            this.setRotate(this.getRotate() - 0.05);
+        //Kalkulere ny rotasjonSpeed
+        rotasjonSpeed = rotasjonSpeed - friksjonRotasjonSpeed;
+
+        //Hvis at minimunspeed har blitt truffet og distansen fra vinnerfeltet er positivt, bruk disaanse til speed istedenfor
+        //else fortsette å bruke vanlig rotasjonspeed
+        if (minSpeed && distanseFraVFelt > 0) {
+            this.setRotate(this.getRotate()-(distanseFraVFelt/1000));
         } else {
-            rotasjonSpeed = rotasjonSpeed - friksjonRotasjonSpeed;
-            this.setRotate(this.getRotate() - rotasjonSpeed);
+            this.setRotate(this.getRotate()-rotasjonSpeed);
         }
-
-        //Hvis at fart er mindre enn 0.07, mimimum fart er true
-        if (rotasjonSpeed < 0.07 && !minSpeed) {
+        //Hvis at fart er mindre enn 0.05, mimimum fart er true
+        if (rotasjonSpeed < 0.5 && !minSpeed && distanseFraVFelt > 70) {
             minSpeed = true;
         }
 
-        //Resett rotasjonen til innenfor 360 grader
+        //Resett rotasjonen til innenfor -360 grader
         if (this.getRotate() < -360)
             this.setRotate(0);
 
@@ -146,13 +148,50 @@ public class Lykkehjul extends Pane {
         }
     };
 
+    //Denne eventen gjør at vinnertallet blir funnet etter spinningen
+    //Har en fart og sakner ned til den lander på noe
+    EventHandler<ActionEvent> eventRandomSpin = e -> {
+        //Kalkulerer hvor mye fart hjulet har mistet
+        double friksjonRotasjonSpeed = 0.001 * rotasjonSpeed;
+
+        rotasjonSpeed = rotasjonSpeed - friksjonRotasjonSpeed;
+        this.setRotate(this.getRotate() - rotasjonSpeed);
+
+        //Resett rotasjonen til innenfor 360 grader
+        if (this.getRotate() < -360)
+            this.setRotate(0);
+
+        //Hvis hjulet har stoppet, kalkuler hvor hjulet landet
+        if (rotasjonSpeed < 0.01) {
+            String utTekst = "Vinnertallet er: ";
+            System.out.println(-feltGrader);
+
+            //Lager en for-løkke for å sjekke gradene for hver felt
+            for (int i = 1; feltAntall>=i; i++) {
+                double sjekkVinnerTallGrader = i * -feltGrader;
+                double sjekkVinnerTallMaxGrader = sjekkVinnerTallGrader - feltGrader;
+
+                //Hvis at gradene er riktig, sett i til vinnertall
+                //Forflytter gradene med en halv feltgrad, fordi den "ekte" nålen er litt til venstre
+                if (this.getRotate() < sjekkVinnerTallGrader+(feltGrader/2) && this.getRotate() > sjekkVinnerTallMaxGrader+(feltGrader/2)) {
+                    vinnerTall = i;
+                }
+            }
+            System.out.println(utTekst + vinnerTall);
+            aktivSpin = false;
+            sequentialTransition.stop();
+        }
+    };
+
+
     protected void spin() {
         sequentialTransition = new SequentialTransition();
         aktivSpin = true;
         minSpeed = false;
 
         //Rotasjonskraften i begynnelsen av spin
-        rotasjonSpeed = 10;
+        rotasjonSpeed = new Random().nextInt(3, 4);
+        System.out.println(rotasjonSpeed);
 
         //Finner vinnertall
         vinnerTall();
@@ -171,8 +210,8 @@ public class Lykkehjul extends Pane {
 
         //Kalkuler hva som er minst og høyeste rotasjonnivå for å forsikre at hjulet lander riktig
         double vinnerFelt = -feltGrader * (double)vinnerTall;
-        vinnerFeltMin = vinnerFelt - 0.1;
-        vinnerFeltMax = vinnerFelt + 0.1;
+        vinnerFeltMin = vinnerFelt - 0.2;
+        vinnerFeltMax = vinnerFelt + 0.2;
     }
 
     //Get-Metoder
