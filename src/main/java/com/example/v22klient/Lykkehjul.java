@@ -63,6 +63,7 @@ public class Lykkehjul extends Pane {
             //Lager en arc - Et arc er et felt
             Arc arcFelt = new Arc();
 
+            //Plasserer 0 før alle siffer
             String nyi = "";
             if (i<10) {
                 nyi = "0"+i;
