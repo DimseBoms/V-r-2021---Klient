@@ -26,7 +26,7 @@ public class KontrollerGUI extends Application {
     public static VBox root = new VBox();
     //Ikke lov med oddetall
     public static int feltAntall = 34;
-    public static Lykkehjul lykkeHjul = new Lykkehjul(feltAntall);
+    private static Lykkehjul lykkeHjul = new Lykkehjul(feltAntall);
     FlowPane velgTallPane;
     VBox rekkePane;
     static Tilkobling tilkobling;
@@ -107,7 +107,7 @@ public class KontrollerGUI extends Application {
         rekkeMedTall.add(42);
         rekkeMedTall.add(12);
         Rekke rekke= new Rekke(rekkeMedTall, 5, bruker);
-        tilkobling.sendRekke(bruker);
+        //tilkobling.sendRekke(bruker);
     }
 
     /**
