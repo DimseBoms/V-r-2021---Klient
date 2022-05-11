@@ -197,14 +197,15 @@ public class KontrollerGUI extends Application {
      * Tallet trekkes tilfeldig fra 1 til 34
      */
     private static void trekkTall2() {
-        if (antallTrukket <= 6) {
+        if (antallTrukket <= 7) {
             fyllRekke();
             antallTrukket++;
-        } else {
-            RekkePanelVisning r = new RekkePanelVisning();
-            rekkeRamme.getChildren().add(r);
-            rekkePanel = r;
-            antallTrukket = 0;
+            if (antallTrukket >= 7) {
+                RekkePanelVisning r = new RekkePanelVisning();
+                rekkeRamme.getChildren().add(r);
+                rekkePanel = r;
+                antallTrukket = 0;
+            }
         }
     }
 
