@@ -137,9 +137,11 @@ public class KomponenterGUI {
     }
 
     public static void lagLastOppFilPane(){
-        velgInputPane.getChildren().clear();
         lastOpp = new Button("Last opp");
-        lastOpp.setOnAction( event -> KontrollerGUI.lesFil());
+        lastOpp.setOnAction( event -> {
+            KontrollerGUI.lesFil();
+            velgInputPane.getChildren().clear();
+        });
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Velg filen du vil laste opp");
@@ -148,6 +150,7 @@ public class KomponenterGUI {
 
 
         if(file != null) {
+            velgInputPane.getChildren().clear();
             filNavn = file.toString();
             Label lbl = new Label(filNavn);
             lbl.setTextFill(Color.WHITE);
