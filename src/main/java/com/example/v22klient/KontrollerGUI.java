@@ -22,6 +22,7 @@ public class KontrollerGUI extends Application {
     public static final int WIDTH = 600;
     public static final int HEIGHT = 800;
     public static VBox root = new VBox();
+    //Ikke lov med oddetall
     public static int feltAntall = 34;
     public static Lykkehjul lykkeHjul = new Lykkehjul(feltAntall);
     FlowPane velgTallPane;

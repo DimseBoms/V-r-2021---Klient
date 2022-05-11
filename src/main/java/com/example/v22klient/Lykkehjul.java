@@ -5,6 +5,7 @@ import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Group;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
@@ -20,10 +21,13 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Lykkehjul extends Pane {
+
+    //Størrselsen på hjulet blir bestemt av bredden av skjermen
     private static final double WIDTH = KontrollerGUI.WIDTH/2;
+
+    //Farge 1 og Farge 2 for feltene
     private static Color farge1 = Color.LIGHTYELLOW;
     private static Color farge2 = Color.CORAL;
-    private static ArrayList<Arc> listFelt = new ArrayList<>();;
     private static final double radius = WIDTH / 2;
     private static double rotasjonSpeed = 10;
     private static double feltGrader, vinnerFeltMin, vinnerFeltMax;
@@ -33,20 +37,47 @@ public class Lykkehjul extends Pane {
     private static SequentialTransition sequentialTransition;
 
     protected Lykkehjul(int feltAntall) {
-        //Kalkulerer hvor mange grader hvert felt er
+        //For å sjekke om hjulet er i spill
         aktivSpin = false;
+
+        //Kalkulerer hvor mange grader hvert felt er
         feltGrader = 360/(double)feltAntall;
+
         double center = WIDTH/2;
-        //Starter med
         double feltGraderStart = feltGrader;
 
         this.setMaxSize(WIDTH, WIDTH);
         this.setMinSize(WIDTH, WIDTH);
 
-        //FOR-løkke for å plassere feltene
+        //Lager en stackPane for text
+        Group g = new Group();
+
+        double widthOffset = 0;
+        double heightOffset = 0;
+
+        //FOR-løkke for å plassere feltene og nummerene
         for (int i = 1; feltAntall>=i; i++) {
             //Lager en arc - Et arc er et felt
             Arc arcFelt = new Arc();
+
+            String nyi = "";
+            if (i<10) {
+                nyi = "0"+i;
+            } else {nyi = ""+i;}
+
+            //Plassere nummer i hjulet
+            Text lblNummer = new Text(nyi);
+            Font fontTall = Font.font("Arial", FontWeight.BOLD, WIDTH / 20);
+            lblNummer.setFont(fontTall);
+
+            //Kalkulerer hvor tallene skal være i feltet
+            //Er også godet for å plassere labels midt i istedenfor nederst til venstre
+            widthOffset = lblNummer.getBoundsInLocal().getWidth();
+            heightOffset = lblNummer.getBoundsInLocal().getHeight();
+            lblNummer.setRotate(feltGraderStart);
+            lblNummer.setLayoutX(center + radius * Math.sin(i * (2 * Math.PI / feltAntall)));
+            lblNummer.setLayoutY(center - radius * Math.cos(i * (2 * Math.PI / feltAntall)));
+            lblNummer.setFill(Color.BLACK);
 
             //Gir farge annenhver
             if (i % 2 == 0) {
@@ -68,36 +99,12 @@ public class Lykkehjul extends Pane {
             feltGraderStart = feltGraderStart + feltGrader;
 
             //Plasserer feltene i Lykkehjul
-            listFelt.add(arcFelt);
             getChildren().add(arcFelt);
+            g.getChildren().add(lblNummer);
         }
-
-        //Resetter feltGraderStart
-        feltGraderStart = feltGrader;
-
-        //For-løkke for å plassere labels
-        for (int i = 1; feltAntall>=i; i++) {
-            String nyi = "";
-            if (i<10) {
-                nyi = "0"+i;
-            } else {nyi = ""+i;}
-            //Plassere nummer i hjulet
-            Text lblNummer = new Text(nyi);
-            Font fontTall = Font.font("Arial", FontWeight.BOLD, WIDTH / 20);
-            lblNummer.setFont(fontTall);
-
-            //Kalkulerer hvor tallene skal være i feltet
-            //Er også godet for å plassere labels midt i istedenfor nederst til venstre
-            double widthOffset = lblNummer.getBoundsInLocal().getWidth();
-            double heightOffset = lblNummer.getBoundsInLocal().getHeight();
-            lblNummer.setRotate(feltGraderStart);
-            lblNummer.setLayoutX((center - widthOffset/2) + radius * Math.sin(i * (2 * Math.PI / feltAntall)));
-            lblNummer.setLayoutY((center + heightOffset/2) - radius * Math.cos(i * (2 * Math.PI / feltAntall)));
-            lblNummer.setFill(Color.BLACK);
-
-            feltGraderStart = feltGraderStart + feltGrader;
-            getChildren().add(lblNummer);
-        }
+        g.setLayoutX(g.getLayoutX()-widthOffset/2);
+        g.setLayoutY(g.getLayoutY()+heightOffset/2);
+        getChildren().add(g);
         Circle midtSirklel = new Circle(center, center, radius /11, Color.GOLDENROD);
         midtSirklel.setStroke(Color.GAINSBORO);
         getChildren().add(midtSirklel);
@@ -134,8 +141,6 @@ public class Lykkehjul extends Pane {
 
         //Hvis at hjulet er over riktig felt og minimumfart er truffet, avslutt rotasjonen
         if (this.getRotate() > vinnerFeltMin && this.getRotate() < vinnerFeltMax && minSpeed) {
-            //Arc arc = listFelt.get(vinnerTall-1);
-            //arc.setFill(Color.BLACK);
             aktivSpin = false;
             sequentialTransition.stop();
         }
@@ -145,13 +150,14 @@ public class Lykkehjul extends Pane {
         sequentialTransition = new SequentialTransition();
         aktivSpin = true;
         minSpeed = false;
+
+        //Rotasjonskraften i begynnelsen av spin
         rotasjonSpeed = 10;
 
-        //Finn vinnertallene
+        //Finner vinnertall
         vinnerTall();
 
-        Timeline tmSpin = new Timeline(
-                new KeyFrame(Duration.millis(1), eventSpin));
+        Timeline tmSpin = new Timeline(new KeyFrame(Duration.millis(1), eventSpin));
         tmSpin.setCycleCount(Timeline.INDEFINITE);
 
         sequentialTransition.getChildren().addAll(tmSpin);
@@ -163,17 +169,10 @@ public class Lykkehjul extends Pane {
         vinnerTall = new Random().nextInt(34);
         System.out.println(vinnerTall);
 
-        //Kalkuler hva som er minst og høyeste rotasjonnivå
+        //Kalkuler hva som er minst og høyeste rotasjonnivå for å forsikre at hjulet lander riktig
         double vinnerFelt = -feltGrader * (double)vinnerTall;
         vinnerFeltMin = vinnerFelt - 0.1;
         vinnerFeltMax = vinnerFelt + 0.1;
-    }
-    private double calculateTextOffsetX(String text, double fontSize) {
-        return ((text.length()) / 2) + fontSize * 0.5;
-    }
-
-    private double calculateTextOffsetY(double fontSize) {
-        return (fontSize / 2) - fontSize * 0.4;
     }
 
     //Get-Metoder
