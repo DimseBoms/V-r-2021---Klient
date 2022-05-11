@@ -5,25 +5,26 @@ import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Group;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextBoundsType;
+import javafx.scene.text.*;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Lykkehjul extends Pane {
-
+    //Her kan man sette størrelse på hjulet. 0 gjør ingen endringer
+    private static double setStørrelse = 5;
     //Størrselsen på hjulet blir bestemt av bredden av skjermen
-    private static final double WIDTH = KontrollerGUI.WIDTH/2;
+    private static final double WIDTH = KontrollerGUI.WIDTH/2 - setStørrelse;
 
     //Farge 1 og Farge 2 for feltene
     private static Color farge1 = Color.LIGHTYELLOW;
@@ -68,18 +69,18 @@ public class Lykkehjul extends Pane {
             } else {nyi = ""+i;}
 
             //Plassere nummer i hjulet
-            Text lblNummer = new Text(nyi);
+            Text txtNummer = new Text(nyi);
             Font fontTall = Font.font("Arial", FontWeight.BOLD, WIDTH / 20);
-            lblNummer.setFont(fontTall);
+            txtNummer.setFont(fontTall);
 
             //Kalkulerer hvor tallene skal være i feltet
             //Er også godet for å plassere labels midt i istedenfor nederst til venstre
-            widthOffset = lblNummer.getBoundsInLocal().getWidth();
-            heightOffset = lblNummer.getBoundsInLocal().getHeight();
-            lblNummer.setRotate(feltGraderStart);
-            lblNummer.setLayoutX(center + radius * Math.sin(i * (2 * Math.PI / feltAntall)));
-            lblNummer.setLayoutY(center - radius * Math.cos(i * (2 * Math.PI / feltAntall)));
-            lblNummer.setFill(Color.BLACK);
+            widthOffset = txtNummer.getBoundsInLocal().getWidth();
+            heightOffset = txtNummer.getBoundsInLocal().getHeight();
+            txtNummer.setRotate(feltGraderStart);
+            txtNummer.setLayoutX(center + radius * Math.sin(i * (2 * Math.PI / feltAntall)));
+            txtNummer.setLayoutY(center - radius * Math.cos(i * (2 * Math.PI / feltAntall)));
+            txtNummer.setFill(Color.BLACK);
 
             //Gir farge annenhver
             if (i % 2 == 0) {
@@ -102,12 +103,12 @@ public class Lykkehjul extends Pane {
 
             //Plasserer feltene i Lykkehjul
             getChildren().add(arcFelt);
-            g.getChildren().add(lblNummer);
+            g.getChildren().add(txtNummer);
         }
         g.setLayoutX(g.getLayoutX()-widthOffset/2);
         g.setLayoutY(g.getLayoutY()+heightOffset/2);
         getChildren().add(g);
-        Circle midtSirklel = new Circle(center, center, radius /11, Color.GOLDENROD);
+        Circle midtSirklel = new Circle(center, center, radius /5, Color.GOLDENROD);
         midtSirklel.setStroke(Color.GAINSBORO);
         getChildren().add(midtSirklel);
     }
@@ -117,7 +118,6 @@ public class Lykkehjul extends Pane {
     EventHandler<ActionEvent> eventSpin = e -> {
         //Kalkulerer hvor mye fart hjulet har mistet
         double friksjonRotasjonSpeed = 0;
-
         //Kalkulerer hvor langt fra vinnerfeltet hjulet er
         double distanseFraVFelt = this.getRotate() - vinnerFeltMin;
         friksjonRotasjonSpeed = 0.001 * rotasjonSpeed;
@@ -144,11 +144,14 @@ public class Lykkehjul extends Pane {
 
         //Hvis at hjulet er over riktig felt og minimumfart er truffet, avslutt rotasjonen
         if (this.getRotate() > vinnerFeltMin && this.getRotate() < vinnerFeltMax && minSpeed) {
+            KomponenterGUI.updateLykkeHjulButton(1);
             aktivSpin = false;
             sequentialTransition.stop();
         }
     };
 
+    //Denne eventen gjør at vinnertallet blir funnet etter spinningen
+    //Har en fart og sakner ned til den lander på noe
     //Denne eventen gjør at vinnertallet blir funnet etter spinningen
     //Har en fart og sakner ned til den lander på noe
     EventHandler<ActionEvent> eventRandomSpin = e -> {
@@ -184,34 +187,43 @@ public class Lykkehjul extends Pane {
     };
 
 
-    protected void spin() {
-        sequentialTransition = new SequentialTransition();
-        aktivSpin = true;
-        minSpeed = false;
+    protected void spin(boolean spinType) {
+        //Passer på at hjulet ikke aktiverers flere ganger
+        if (!aktivSpin) {
+            //Hvis at spinType true, spin normal. False betyr tilfedlig nummer
+            sequentialTransition = new SequentialTransition();
+            aktivSpin = true;
+            minSpeed = false;
 
-        //Rotasjonskraften i begynnelsen av spin
-        rotasjonSpeed = new Random().nextInt(10, 20);
+            //Rotasjonskraften i begynnelsen av spin
+            rotasjonSpeed = new Random().nextInt(10, 20);
 
-        //Finner vinnertall
-        vinnerTall();
-
-        Timeline tmSpin = new Timeline(new KeyFrame(Duration.millis(1), eventSpin));
-        tmSpin.setCycleCount(Timeline.INDEFINITE);
-
-        sequentialTransition.getChildren().addAll(tmSpin);
-        sequentialTransition.play();
+            //Finner vinnertall
+            Timeline tmSpin;
+            if (spinType) {
+                tmSpin = new Timeline(new KeyFrame(Duration.millis(1), eventSpin));
+                vinnerTall = new Random().nextInt(1, 35);
+                System.out.println(vinnerTall);
+            } else {
+                tmSpin = new Timeline(new KeyFrame(Duration.millis(1), eventRandomSpin));
+            }
+            tmSpin.setCycleCount(Timeline.INDEFINITE);
+            vinnerTallFelt();
+            sequentialTransition.getChildren().addAll(tmSpin);
+            sequentialTransition.play();
+        }
     }
 
     //Metoder
-    private void vinnerTall() {
-        vinnerTall = new Random().nextInt(33, 35);
-        System.out.println(vinnerTall);
-
+    private void vinnerTallFelt() {
         //Kalkuler hva som er minst og høyeste rotasjonnivå for å forsikre at hjulet lander riktig
         double vinnerFelt = -feltGrader * (double)vinnerTall;
         vinnerFeltMin = vinnerFelt - 0.2;
-        System.out.println(vinnerFeltMin);
         vinnerFeltMax = vinnerFelt + 0.2;
+    }
+
+    protected void tilbakeStill() {
+        this.setRotate(0);
     }
 
     //Get-Metoder

@@ -23,9 +23,10 @@ public class KomponenterGUI {
     public static ArrayList<ToggleButton> tallKnapperListe;
     public static ArrayList<Integer> rekkeTall;
     protected static int toggleTeller = 0;
-    public static Button velgSelv, lastOppFil, lastOpp, velgFil, angre;
+    public static Button velgSelv, lastOppFil, lastOpp, velgFil, angre, btnSpin;
     public static String filNavn;
     public static HBox velgInputPane;
+    public static VBox lykkeHjulPane;
 
     public static VBox lagLykkeHjulPane(Lykkehjul lykkeHjul){
         double nålLengde = KontrollerGUI.WIDTH/30;
@@ -35,13 +36,35 @@ public class KomponenterGUI {
         nål.setStroke(Color.BLACK);
         nål.setLayoutX(0);
         nål.setLayoutY(0);
-        VBox stack = new VBox();
-        stack.getChildren().addAll(nål, lykkeHjul);
-        stack.setBackground(new Background(new BackgroundFill(Color.DARKSLATEGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-        stack.setAlignment(Pos.CENTER);
-        stack.setPadding(new Insets(50));
-        stack.setSpacing(25);
-        return stack;
+
+        btnSpin = new Button();
+        updateLykkeHjulButton(2); //Setter til start spill
+        btnSpin.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        btnSpin.setAlignment(Pos.BOTTOM_CENTER);
+        btnSpin.setOnAction( e -> {
+            if (!lykkeHjul.getAktivSpin()) {
+                switch (btnSpin.getText()) {
+                    case "$ SPIN $":
+                        lykkeHjul.spin(true);
+                        updateLykkeHjulButton(3); //Setter button til ...spinning
+                        break;
+                    case "START SPILL":
+                        updateLykkeHjulButton(1); //Setter til $ SPIN $
+                        break;
+                    case "START NYTT SPILL":
+                        updateLykkeHjulButton(4); //Setter til START SPILL
+                        break;
+                    default: System.out.println("ERROR"); break;
+                }
+            }
+        });
+
+        lykkeHjulPane = new VBox();
+        lykkeHjulPane.getChildren().addAll(nål, lykkeHjul, btnSpin);
+        lykkeHjulPane.setAlignment(Pos.BOTTOM_CENTER);
+        lykkeHjulPane.setPadding(new Insets(50));
+        lykkeHjulPane.setSpacing(30);
+        return lykkeHjulPane;
     }
 
     public static FlowPane lagVelgTallPane(int antallTall){
@@ -174,10 +197,36 @@ public class KomponenterGUI {
         lastOpp.setOnAction( event -> {
             KontrollerGUI.lesFil(filNavn);
         });
-
         velgInputPane.getChildren().addAll(velgFil, lastOpp, angre, lastOppFilNavnInput);
-
     }
+
+    //Oppdaterer button basert på hvilken int som blir sendt inn. Må være mellom 1-4
+    public static void updateLykkeHjulButton(int setBtnSpin) {
+        switch (setBtnSpin) {
+            case 1:
+                btnSpin.setText("$ SPIN $");
+                btnSpin.setBackground(Background.fill(Color.GOLDENROD));
+                btnSpin.setTextFill(Color.BLACK);
+                break;
+            case 2:
+                btnSpin.setText("START SPILL");
+                btnSpin.setBackground(Background.fill(Color.GOLDENROD));
+                btnSpin.setTextFill(Color.BLACK);
+                break;
+            case 3:
+                btnSpin.setText("Spinner...");
+                btnSpin.setBackground(Background.fill(Color.WHITESMOKE));
+                btnSpin.setTextFill(Color.GRAY);
+                break;
+            case 4:
+                btnSpin.setText("START NYTT SPILL");
+                btnSpin.setBackground(Background.fill(Color.GOLDENROD));
+                btnSpin.setTextFill(Color.BLACK);
+            default:
+                btnSpin.setText("updateLykkeHjulButton input må være mellom 1-4");
+        }
+    }
+
 
 
     //gevinst-visning

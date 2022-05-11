@@ -259,14 +259,26 @@ public class KontrollerGUI extends Application {
         MenuItem miA2 = new MenuItem("Generer sum innsats");
         MenuItem miA3 = new MenuItem("Generer sum gevinst");
         MenuItem mia4 = new MenuItem("Send rekker og satser");
+        MenuItem mia5 = new MenuItem("Spinn (Random Generator)");
+        MenuItem mia6 = new MenuItem("Tilbakestill hjul");
 
-        miA0.setOnAction(e-> lykkeHjul.spin());
+
+        miA0.setOnAction(e-> lykkeHjul.spin(true));
         miA1.setOnAction(e-> velgTall(34) );
         miA2.setOnAction(e-> oppdaterSum(1, RekkePanelVisning.hentInnsats()));
         mia4.setOnAction(e-> tilkobling.sendRekke(bruker));
 //        miA3.setOnAction(e-> oppdaterSum(2, RekkePanelVisning.aggregerInnsats()));
+        mia5.setOnAction(e-> lykkeHjul.spin(false));
+        //Tilbakestiller hjulet
+        mia6.setOnAction(e-> {
+            if (!lykkeHjul.getAktivSpin()) {
+                lykkeHjul.tilbakeStill();
+            } else {
+                System.out.println("Hjulet kan ikke tilbakestilles mens den spinner");
+            }
+        });
 
-        meny1.getItems().addAll(miA0, miA1, miA2, miA3, mia4);
+        meny1.getItems().addAll(miA0, miA1, miA2, miA3, mia4, mia5, mia6);
 
         mb.getMenus().addAll(meny1);
         return mb;
