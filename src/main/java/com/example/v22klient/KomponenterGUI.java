@@ -22,6 +22,7 @@ public class KomponenterGUI {
     public static TextField telefonInput, epostInput, fNavnInput, eNavnInput;
     public static ArrayList<ToggleButton> tallKnapperListe;
     public static ArrayList<Integer> rekkeTall;
+    protected static int toggleTeller = 0;
     public static Button velgSelv, lastOppFil, lastOpp;
     public static String filNavn;
     public static VBox velgInputPane;
@@ -53,6 +54,8 @@ public class KomponenterGUI {
             ToggleButton velgTallKnapp = new ToggleButton("" + (i + 1));
             velgTallKnapp.setOnAction( e -> {
                 KontrollerGUI.velgTall(antallTall);
+                // TODO: her skal vi sende tallet fra knappen til kula
+                toggleTeller++;
             });
             tallKnapperListe.add(velgTallKnapp);
         }
