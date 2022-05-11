@@ -29,6 +29,10 @@ public class RekkePanelVisning extends HBox {
     private static int samletInnsats = 0;
     static double total;
 
+    /**
+     * Konstruktøren instansierer et rekkepanel for lottorekker
+     * Kuler i panelet er av klasse TallTrekkVisning
+     */
     public RekkePanelVisning() {
         tallBallArray = new ArrayList<>();
         this.setSpacing(15);
@@ -50,6 +54,10 @@ public class RekkePanelVisning extends HBox {
         this.rammer.add(this);
     }
 
+    /**
+     * Summerer total innsats fra rekker
+     * @return
+     */
     public double hentInnsats() {
         for (RekkePanelVisning r : rammer) {
             if (!innsats.getText().equals(""))
@@ -59,6 +67,10 @@ public class RekkePanelVisning extends HBox {
         return total;
     }
 
+    /**
+     * For hente ut innsats fra tekstfelt
+     * @return
+     */
     public double getInnsats() {
         if (!innsats.getText().isEmpty()) {
             return Double.parseDouble(innsats.getText());
@@ -70,6 +82,9 @@ public class RekkePanelVisning extends HBox {
 
     }
 
+    /**
+     * Leser av innsats
+     */
     private void lyttPåInnsats() {
         this.innsats.setOnAction(e-> {
             this.kronerSatset = Integer.parseInt(innsats.getText());
@@ -82,14 +97,25 @@ public class RekkePanelVisning extends HBox {
         });
     }
 
+    /**
+     * Sletter rader/rekker ved aktivering av slettknapp
+     */
     private void lyttPåSlettRekkePanel() {
         this.slettRekkePanel.setOnAction(e -> {
-            this.rammer.remove(this);
-            KontrollerGUI.OppdaterRekkeVisning(this);
-            System.out.println("slettKnapp avlest");
+            if (!KontrollerGUI.lykkeHjul.spillStarted) {
+                this.rammer.remove(this);
+                KontrollerGUI.OppdaterRekkeVisning(this);
+                System.out.println("slettKnapp avlest");
+            }
         });
     }
 
+    /**
+     * Metode for å bygge opp et rekkekomponent fra fil
+     * Denne utgaven er ikke redigerbar, kun insatts kan legges inn
+     * @param rekkerFraFil
+     * @return
+     */
     protected static VBox visRekkerFraFil(ArrayList<ArrayList<Integer>> rekkerFraFil) {
         VBox boks = new VBox();
         boks.setPadding(new Insets(10));
@@ -105,11 +131,19 @@ public class RekkePanelVisning extends HBox {
         return boks;
     }
 
+    /**
+     * Legger kuler i array
+     * @param tallBall
+     */
     void leggTilResponsivBall(TallTrekkVisning tallBall) {
         tallBallArray.add(tallBall);
         this.getChildren().add(tallBall);
     }
 
+    /**
+     * Henter tallBallArray
+     * @return
+     */
     public ArrayList<TallTrekkVisning> getTallBallArray() {
         return tallBallArray;
     }

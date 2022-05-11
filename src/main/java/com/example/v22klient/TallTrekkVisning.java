@@ -20,7 +20,11 @@ public class TallTrekkVisning extends HBox {
     boolean vinnerStatus = false;
     int verdi;
 
-
+    /**
+     * Konstruktøren oppretter nummererte kuler
+     * som legges i et rekkepanel (klasse RekkePanelVisning)
+     * @param tall Bruker velger tall til rekke
+     */
     public TallTrekkVisning(int tall) {
         this.verdi = tall;
         this.rekkeNr++;
@@ -32,25 +36,7 @@ public class TallTrekkVisning extends HBox {
         this.tallNode.setBoundsType(TextBoundsType.VISUAL);
         this.stackPane.getChildren().addAll(sirkel, tallNode);
         this.getChildren().add(stackPane);
-        this.setOnMouseClicked(e -> {
-            this.sirkel.setFill(Color.TOMATO);
-            this.tilSletting = true;
-        });
         this.rekkeVisninger.add(this);
-    }
-
-    public TallTrekkVisning(ArrayList<Integer> rekke) {
-        for (Integer i : rekke) {
-            this.stackPane = new StackPane();
-            this.sirkel = new Circle(RADIUS);
-            this.sirkel.setStroke(Color.WHITESMOKE);
-            this.sirkel.setFill(Color.BLUE);
-            this.tallNode = new Text(i.toString());
-            this.tallNode.setBoundsType(TextBoundsType.VISUAL);
-            this.stackPane.getChildren().addAll(sirkel, tallNode);
-            this.getChildren().add(stackPane);
-        }
-
     }
 
     public int getVerdi() {
@@ -67,18 +53,6 @@ public class TallTrekkVisning extends HBox {
         this.vinnerStatus = true;
         this.sirkel.setFill(Color.GOLD);
     }
-
-    /*
-    private static void slettMarkerteTall() {
-        for (TallTrekkVisning rekkeVisning : TallTrekkVisning.getRekkeVisninger()) {
-            if (rekkeVisning.isTilSletting()) {
-                rekkePanel.getChildren().remove(rekkeVisning);
-                antallTrukket--;
-            }
-        }
-    }
-
-     */
 }
 
 

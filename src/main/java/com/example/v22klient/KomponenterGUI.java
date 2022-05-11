@@ -17,6 +17,11 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.ArrayList;
 
+import static com.example.v22klient.KontrollerGUI.lykkeHjul;
+
+/**
+ * KomponenterGUI inneholder panes og komponter som blir brukt i applikasjonen
+ */
 public class KomponenterGUI {
 
     public static TextField telefonInput, epostInput, fNavnInput, eNavnInput, lastOppFilNavnInput;
@@ -28,6 +33,13 @@ public class KomponenterGUI {
     public static HBox velgInputPane;
     public static VBox lykkeHjulPane;
 
+    /**
+     * Metoden lager en pane for å inneholde lykkehjulet + nål og knapp som er tilkoblet til lykkehjulet
+     *
+     * @param lykkeHjul
+     * @return
+     * Den returnerer en VBox til KontrollerGUI
+     */
     public static VBox lagLykkeHjulPane(Lykkehjul lykkeHjul){
         double nålLengde = KontrollerGUI.WIDTH/30;
         double nålGrader = KontrollerGUI.WIDTH/6;
@@ -39,19 +51,25 @@ public class KomponenterGUI {
 
         btnSpin = new Button();
         updateLykkeHjulButton(2); //Setter til start spill
-        btnSpin.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        btnSpin.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         btnSpin.setAlignment(Pos.BOTTOM_CENTER);
         btnSpin.setOnAction( e -> {
             if (!lykkeHjul.getAktivSpin()) {
                 switch (btnSpin.getText()) {
                     case "$ SPIN $":
-                        lykkeHjul.spin(true);
-                        updateLykkeHjulButton(3); //Setter button til ...spinning
+                        if (lykkeHjul.getVinnerCounter() < 7) {
+                            lykkeHjul.spin(true);
+                            updateLykkeHjulButton(3); //Setter button til ...spinning
+                        }
                         break;
                     case "START SPILL":
+                        KontrollerGUI.tilkobling.sendRekke(Tilkobling.bruker);
+                        lykkeHjul.spillStarted = true;
                         updateLykkeHjulButton(1); //Setter til $ SPIN $
                         break;
                     case "START NYTT SPILL":
+                        lykkeHjul.spillStarted = false;
+                        lykkeHjul.tilbakeStillVinnerCounter();
                         updateLykkeHjulButton(4); //Setter til START SPILL
                         break;
                     default: System.out.println("ERROR"); break;
@@ -67,6 +85,12 @@ public class KomponenterGUI {
         return lykkeHjulPane;
     }
 
+    /**
+     * Metoden oppretter en flowpane som holder på togglebuttons
+     * Togglebuttons aktiverer bygging av rekker
+     * @param antallTall
+     * @return
+     */
     public static FlowPane lagVelgTallPane(int antallTall){
         FlowPane velgtallPane = new FlowPane();
         velgtallPane.setPadding(new Insets(0,0,10,0));
@@ -81,10 +105,12 @@ public class KomponenterGUI {
             ToggleButton velgTallKnapp = new ToggleButton("" + (i + 1));
             velgTallKnapp.setPrefWidth(30);
             velgTallKnapp.setOnAction( e -> {
-                velgTallKnapp.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE,null,null)));
-                KontrollerGUI.velgTall(antallTall);
-                // TODO: her skal vi sende tallet fra knappen til kula
-                toggleTeller++;
+                if (!KontrollerGUI.lykkeHjul.spillStarted) {
+                    velgTallKnapp.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE,null,null)));
+                    KontrollerGUI.velgTall(antallTall);
+                    // TODO: her skal vi sende tallet fra knappen til kula
+                    toggleTeller++;
+                }
             });
             tallKnapperListe.add(velgTallKnapp);
         }
@@ -94,6 +120,9 @@ public class KomponenterGUI {
         return velgtallPane;
     }
 
+    /**
+     * Resetter toggle av knapper
+     */
     public static void resetToggle() {
         for (ToggleButton tb : tallKnapperListe) {
             tb.setSelected(false);
@@ -102,7 +131,10 @@ public class KomponenterGUI {
         }
     }
 
-
+    /**Metoden oppretter en VBox som visuelt viser rekkene
+     *
+     * @return
+     */
     public VBox lagRekkePane(){
         VBox rekkePane = new VBox();
         for (int i = 0; i < KontrollerGUI.valgteRekker.size(); i++){
@@ -114,7 +146,11 @@ public class KomponenterGUI {
         return rekkePane;
     }
 
-    //Innlogging
+    /**
+     *
+     * @return
+     * Lager VBox som inneholder komponenter for innlogging
+     */
     public static VBox lagInnloggingPane(){
         HBox tittelBox = new HBox();
         tittelBox.setAlignment(Pos.CENTER);
@@ -156,6 +192,10 @@ public class KomponenterGUI {
         return loggInnPane;
     }
 
+    /**
+     * @return
+     * Lager pane for velging av hvordan man ønsker å hente rekker
+     */
     public static HBox lagVelgInputPane(){
         velgInputPane = new HBox();
         velgInputPane.setPadding(new Insets(10));
@@ -177,7 +217,7 @@ public class KomponenterGUI {
     }
 
     /**
-     * GIR NULLPOINTER DERSOM BRUKER AVBRYTER. BØR HA BEDRE UNNTAKSHÅNDTERING
+     *Lager pane for opplasting av filer
      */
     public static void lagLastOppFilPane(){
         velgInputPane.getChildren().clear();
@@ -200,7 +240,14 @@ public class KomponenterGUI {
         velgInputPane.getChildren().addAll(velgFil, lastOpp, angre, lastOppFilNavnInput);
     }
 
-    //Oppdaterer button basert på hvilken int som blir sendt inn. Må være mellom 1-4
+    /**
+     * @param setBtnSpin
+     * Oppdaterer button basert på hvilken int som blir sendt inn. Må være mellom 1-4
+     * Hvis at den er 1, vil teksten være SPIN
+     * 2 = Start spill
+     * 3 = Spinner...
+     * 4 = Start nytt spill
+     */
     public static void updateLykkeHjulButton(int setBtnSpin) {
         switch (setBtnSpin) {
             case 1:
@@ -228,12 +275,28 @@ public class KomponenterGUI {
     }
 
 
+    /**
+     * Gevinst-visning
+     * Denne lages hvis at bruker vant noe gevinst. Hvis ikke starter den opp andre visningen visIngenGevinst()
+     */
+    protected static void visGevinst() {
+        if (Tilkobling.svarListe.size() > 0) {
+            Alert alertVisGevinst = new Alert(Alert.AlertType.CONFIRMATION);
+            String vinnerRekke = Tilkobling.svarListe.toString();
+            String gevinst = Tilkobling.gevinnstListe.toString();
+            alertVisGevinst.setHeaderText("Du vant på følgende rekker: " + vinnerRekke + "\n"
+                                         + "Din gevinst er: " + gevinst);
+            alertVisGevinst.showAndWait();
+        } else {visIngenGevinst();}
+    }
 
-    //gevinst-visning
-
-
-
-    //ingen gevinst-visning
-
+    /**
+     * Denne alerten starter hvis at bruker ikke vant noe gevinst
+     */
+    protected static void visIngenGevinst() {
+        Alert alertVisIngenGevinst = new Alert(Alert.AlertType.CONFIRMATION);
+        alertVisIngenGevinst.setHeaderText("Du vant ingenting, men bedre lykke neste gang!");
+        alertVisIngenGevinst.showAndWait();
+    }
 
 }

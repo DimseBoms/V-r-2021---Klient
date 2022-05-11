@@ -7,6 +7,13 @@ public class Bruker {
     protected ArrayList<Integer> innsatsListe;
     protected String fornavn, etternavn, epost, tlf;
 
+    /**
+     * Inneholder informasjonen om bruker
+     * @param fornavn
+     * @param etternavn
+     * @param epost
+     * @param tlf
+     */
     public Bruker(String fornavn, String etternavn, String epost, String tlf) {
         this.fornavn = fornavn;
         this.etternavn = etternavn;

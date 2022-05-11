@@ -11,15 +11,23 @@ import java.util.HashMap;
 public class Tilkobling {
     // Tilkoblingsvariabler
     public final String IP = "localhost";
+    protected static ArrayList<Integer> svarListe;
+
+    protected static ArrayList<Integer> innsatsListe;
     public final int PORT = 8000;
     // Etablerer variabler for ObjectStreams som vil bli benyttet til overføring av data mellom klient og tjener
     private Socket socket;
     private ObjectInputStream innStrøm;
     private ObjectOutputStream utStrøm;
-    private Bruker bruker;
+    //endret til static for testing av spin()
+    protected static Bruker bruker;
     private boolean brukerLoggetInn = false;
+    protected static ArrayList<Integer> gevinnstListe;
 
-    // Oppretter tilkobling
+    /**
+     * Oppretter tilkobling mellom klient og tjener
+     * @throws IOException
+     */
     public Tilkobling() throws IOException {
         System.out.println("Forsøker å koble til");
         try {
@@ -33,7 +41,9 @@ public class Tilkobling {
         }
     }
 
-    // Logger inn bruker
+    /**
+     * Logger inn bruker
+     */
     public void loggInnBruker() {
         try {
             System.out.println("Startet loggInnBruker");
@@ -60,13 +70,20 @@ public class Tilkobling {
             throw new RuntimeException(e);
         }
     }
-    // Overlastet metode for å oppdatere brukervariabel før kall på leggInnBruker()
+
+    /**
+     * Overlastet metode for å oppdatere brukervariabel før kall på leggInnBruker()
+     * @param bruker
+     */
     public void loggInnBruker(Bruker bruker) {
         this.bruker = bruker;
         loggInnBruker();
     }
 
-    // Send data
+    /**
+     * Send rekker til tjener
+     * @param bruker
+     */
     public void sendRekke(Bruker bruker) {
         try {
             // Oppretter og sender HashMap med bruker sine rekker
@@ -91,10 +108,16 @@ public class Tilkobling {
         }
     }
 
-    // Denne metoden skal iterere gjennom alle verdiene i svar og sjekke alle verdiene i RekkePanelene
-    // For deretter å endre farge på vinnerkulene til grønn.
+    /**
+     * Denne metoden skal iterere gjennom alle verdiene i svar og sjekke alle verdiene i RekkePanelene
+     * For deretter å endre farge på vinnerkulene til grønn
+     * @param svar
+     */
     private void sjekkVunnet(HashMap<Object, Object> svar) {
-        ArrayList<Integer> svarListe = (ArrayList<Integer>) svar.get("vinnerRekke");
+        svarListe = (ArrayList<Integer>) svar.get("vinnerRekke");
+        innsatsListe = (ArrayList<Integer>) svar.get("innsats");
+        gevinnstListe= (ArrayList<Integer>) svar.get("gevinst");
+        System.out.println(svarListe);
         for (int vinnerTall : svarListe) {
             for (RekkePanelVisning rad : RekkePanelVisning.rammer) {
                 for (TallTrekkVisning tallBall : rad.getTallBallArray()) {
@@ -104,7 +127,12 @@ public class Tilkobling {
         }
     }
 
-    // Hjelpemetode for å lukke alle åpne strømmer og sockets
+    /**
+     * Hjelpemetode for å lukke alle åpne strømmer og sockets
+     * @param socket
+     * @param innStrøm
+     * @param utStrøm
+     */
     public void closeEverything(Socket socket, ObjectInputStream innStrøm, ObjectOutputStream utStrøm) {
         try {
             if (innStrøm != null) {

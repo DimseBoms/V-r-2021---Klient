@@ -1,10 +1,8 @@
 package com.example.v22klient;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -15,24 +13,25 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.Socket;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * KontrollerGUI er klassen som bestemmer hvilken komponenter og panes som blir bruket
+ */
 public class KontrollerGUI extends Application {
     public static final int WIDTH = 600;
     public static final int HEIGHT = 800;
     public static VBox root = new VBox();
     //Ikke lov med oddetall
     public static int feltAntall = 34;
-    private static Lykkehjul lykkeHjul = new Lykkehjul(feltAntall);
+    protected static Lykkehjul lykkeHjul = new Lykkehjul(feltAntall);
     FlowPane velgTallPane;
     VBox rekkePane;
     static Tilkobling tilkobling;
-    static Bruker bruker;
-    private static int gautesTall;
+    protected static Bruker bruker;
+    private static int tallFraToggle;
 
     // variabler fra leo
     private static RekkePanelVisning rekkePanel;
@@ -42,8 +41,11 @@ public class KontrollerGUI extends Application {
     private ArrayList<HBox> rekkePaneler = new ArrayList<>();
     private static Label sum;
     private static boolean innlesingGodkjent;
+    private static ArrayList<Integer> kontrollAvDuplikat = new ArrayList<>();
 
-    // Oppretter tilkobling til tjener
+    /**
+     * Oppretter tilkobling til tjener
+     */
     public static void kobleTilTjener() {
         try {
             tilkobling = new Tilkobling();
@@ -120,7 +122,6 @@ public class KontrollerGUI extends Application {
 
     /**
      * Kontroll av format på telefonnummer.
-     * Bør man fjerne mellomrom? i så fall må disse fjernes fra original String også!!
      * Bør utvides til å akseptere flere formater
      */
     private static boolean kontrollerTlfNr(String tlf) {
@@ -141,13 +142,18 @@ public class KontrollerGUI extends Application {
         return matcher.matches();
     }
 
+    /**
+     *
+     * @param antallTall
+     * Komponenten for å lage tallene i en rekke
+     */
     public static void velgTall(int antallTall){
         for(int k = 0; k < antallTall; k++){
             if(KomponenterGUI.tallKnapperListe.get(k).isSelected() && KomponenterGUI.rekkeTall.size() < 7){
                 if(!KomponenterGUI.rekkeTall.contains(KomponenterGUI.tallKnapperListe.indexOf(KomponenterGUI.tallKnapperListe.get(k)) + 1)) {
                     KomponenterGUI.rekkeTall.add(KomponenterGUI.tallKnapperListe.indexOf(KomponenterGUI.tallKnapperListe.get(k)) + 1);
-                    gautesTall = Integer.parseInt(KomponenterGUI.tallKnapperListe.get(k).getText());
-                    System.out.println(gautesTall);
+                    tallFraToggle = Integer.parseInt(KomponenterGUI.tallKnapperListe.get(k).getText());
+                    System.out.println(tallFraToggle);
                 }
             }
             if(KomponenterGUI.rekkeTall.size() == 7){
@@ -157,14 +163,24 @@ public class KontrollerGUI extends Application {
                 // Nullstiller
                 KomponenterGUI.resetToggle();
                 KomponenterGUI.rekkeTall.clear();
-                KomponenterGUI.toggleTeller = 0;
+                kontrollAvDuplikat.clear(); // DENNE MÅ MED
             }
+        }
+        // KODESNUTT FOR Å KONTROLLERE DUPLIKATER PR REKKE MED BALLER
+        if (kontrollAvDuplikat.contains(tallFraToggle)) {
+            System.out.print("Duplikat: stopp videre");
+            return;
+        } else {
+            kontrollAvDuplikat.add(tallFraToggle);
         }
         trekkTall2();
         rekkeRamme.setStyle("-fx-background-color: dimgrey");
         System.out.println(KomponenterGUI.rekkeTall);
     }
 
+    /**
+     * Visningen for å hente rekker gjennom filer
+     */
     private static void filVisning() {
         KomponenterGUI.lagLastOppFilPane();
         root.getChildren().clear();
@@ -189,7 +205,7 @@ public class KontrollerGUI extends Application {
         }
         //   rekkePanel.getChildren().add(new TallTrekkVisning(new Random().nextInt(34)));
         // Legger til ny tallball gjennom RekkePanelVisning slik at alle tallballer har en ref. til et RekkePanel
-        rekkePanel.leggTilResponsivBall(new TallTrekkVisning(gautesTall));
+        rekkePanel.leggTilResponsivBall(new TallTrekkVisning(tallFraToggle));
     }
 
     /**
@@ -272,7 +288,7 @@ public class KontrollerGUI extends Application {
         //Tilbakestiller hjulet
         mia6.setOnAction(e-> {
             if (!lykkeHjul.getAktivSpin()) {
-                lykkeHjul.tilbakeStill();
+                lykkeHjul.tilbakeStillHjul();
             } else {
                 System.out.println("Hjulet kan ikke tilbakestilles mens den spinner");
             }
@@ -284,6 +300,9 @@ public class KontrollerGUI extends Application {
         return mb;
     }
 
+    /**
+     * Hvis bruker ønsker å lage nye rekker selv uten filer
+     */
     public static void visVelgSelv() {
         root.getChildren().clear();
         root.getChildren().addAll(
@@ -295,6 +314,11 @@ public class KontrollerGUI extends Application {
         );
     }
 
+    /**
+     *
+     * @param rekkerFraFil
+     * @return
+     */
     protected static VBox visRekkerFraFil(ArrayList<ArrayList<Integer>> rekkerFraFil) {
         VBox boks = new VBox();
         boks.setPadding(new Insets(10));
@@ -309,6 +333,12 @@ public class KontrollerGUI extends Application {
         }
         return boks;
     }
+
+    /**
+     *
+     * @param rekker
+     * Viser rekkene som er avlest i en fil visuelt
+     */
     private static void visFraFil(ArrayList<ArrayList<Integer>> rekker) {
         root.getChildren().clear();
         root.getChildren().addAll(
@@ -319,7 +349,13 @@ public class KontrollerGUI extends Application {
         );
     }
 
-
+    /**
+     *
+     * @param filnavn
+     * @return
+     * Metoden for å lese filer. Trenger en filnavn
+     * Gjør innholdet om til en ArrayList
+     */
     public static ArrayList<ArrayList<Integer>> lesFil (String filnavn) {
         innlesingGodkjent = true;
         ArrayList<ArrayList<Integer>> rekker = new ArrayList<>();
