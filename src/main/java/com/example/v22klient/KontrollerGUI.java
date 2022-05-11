@@ -17,9 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,6 +41,7 @@ public class KontrollerGUI extends Application {
     private static int antallTrukket;
     private ArrayList<HBox> rekkePaneler = new ArrayList<>();
     private static Label sum;
+    private static boolean innlesingGodkjent;
 
     // Oppretter tilkobling til tjener
     public static void kobleTilTjener() {
@@ -265,7 +264,7 @@ public class KontrollerGUI extends Application {
 
         miA0.setOnAction(e-> lykkeHjul.spin(true));
         miA1.setOnAction(e-> velgTall(34) );
-        miA2.setOnAction(e-> oppdaterSum(1, RekkePanelVisning.hentInnsats()));
+        //miA2.setOnAction(e-> oppdaterSum(1, RekkePanelVisning.hentInnsats()));
         mia4.setOnAction(e-> tilkobling.sendRekke(bruker));
 //        miA3.setOnAction(e-> oppdaterSum(2, RekkePanelVisning.aggregerInnsats()));
         mia5.setOnAction(e-> lykkeHjul.spin(false));
@@ -321,6 +320,7 @@ public class KontrollerGUI extends Application {
 
 
     public static ArrayList<ArrayList<Integer>> lesFil (String filnavn) {
+        innlesingGodkjent = true;
         ArrayList<ArrayList<Integer>> rekker = new ArrayList<>();
         File fil = new File(filnavn);
         int antallRekker = 0;
@@ -354,13 +354,35 @@ public class KontrollerGUI extends Application {
                 rekker.add(arr);
             }catch (Exception e){
                 System.out.println("Det er en feil i filen. Sjekk tekstfilen og prøv igjen.");
-                varsleBruker("Det er en feil i tekstfilen.");
+                varsleBruker("Det er en feil i tekstfilen. Sjekk tekstfilen og prøv på nytt");
+                innlesingGodkjent = false;
                 rekker.clear();
                 break;
             }
         }
+
+        for(ArrayList<Integer> arr : rekker){
+            Set<Integer> set = new HashSet<Integer>(arr);
+            if(set.size() < arr.size()){
+                varsleBruker("En eller flere rekker i tekstfilen inneholder like tall. Alle rekker må inneholde unike tall");
+                rekker.clear();
+                innlesingGodkjent = false;
+                break;
+            }
+            for(Integer tall : arr){
+                if(tall < 1 || tall > 34){
+                    varsleBruker("Det er tall mindre enn 0, eller større enn 34 i rekkene. Sjekk rekkene på nytt");
+                    rekker.clear();
+                    innlesingGodkjent = false;
+                    break;
+                }
+            }
+        }
+
         System.out.println(rekker);
-        visFraFil(rekker);
+        if(innlesingGodkjent){
+            visFraFil(rekker);
+        }
         return rekker;
     }
 
