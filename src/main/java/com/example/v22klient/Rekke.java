@@ -10,12 +10,12 @@ public class Rekke {
 
 
     public Rekke(ArrayList<Integer>rekkeMedTall, int rekkePris, Bruker bruker) {
-
         this.tallRekke = new ArrayList<>(rekkeMedTall);
         Collections.sort(tallRekke);
         this.innsats= rekkePris;
         bruker.innsatsListe.add(this.innsats);
         bruker.rekkeListe.add(this.tallRekke);
+        System.out.println("Ny rekke laget:" + this);
     }
 
     @Override
