@@ -152,12 +152,13 @@ public class KontrollerGUI extends Application {
                 }
             }
             if(KomponenterGUI.rekkeTall.size() == 7){
-                KomponenterGUI.resetToggle();
-                KomponenterGUI.rekkeTall.clear();
-                KomponenterGUI.toggleTeller = 0;
                 // Sender utfylt rekke til metode som legger til rekke for sending.
                 int placeholderInt = 30;
                 new Rekke(KomponenterGUI.rekkeTall, placeholderInt, bruker);
+                // Nullstiller
+                KomponenterGUI.resetToggle();
+                KomponenterGUI.rekkeTall.clear();
+                KomponenterGUI.toggleTeller = 0;
             }
         }
         trekkTall2();
@@ -188,7 +189,8 @@ public class KontrollerGUI extends Application {
             rekkeRamme.getChildren().add(rekkePanel);
         }
         //   rekkePanel.getChildren().add(new TallTrekkVisning(new Random().nextInt(34)));
-        rekkePanel.getChildren().add(new TallTrekkVisning(gautesTall));
+        // Legger til ny tallball gjennom RekkePanelVisning slik at alle tallballer har en ref. til et RekkePanel
+        rekkePanel.leggTilResponsivBall(new TallTrekkVisning(gautesTall));
     }
 
     /**
@@ -281,12 +283,35 @@ public class KontrollerGUI extends Application {
         );
     }
 
+    protected static VBox visRekkerFraFil(ArrayList<ArrayList<Integer>> rekkerFraFil) {
+        VBox boks = new VBox();
+        boks.setPadding(new Insets(10));
+        boks.setSpacing(5);
+        boks.setStyle("-fx-background-color: dimgrey");
+        for(ArrayList<Integer> liste : rekkerFraFil){
+            RekkePanelVisning rekke = new RekkePanelVisning();
+            for (int k = 0; k < 7; k++){
+                rekke.getChildren().add(new TallTrekkVisning(liste.get(k)));
+            }
+            boks.getChildren().add(rekke);
+        }
+        return boks;
+    }
+    private static void visFraFil(ArrayList<ArrayList<Integer>> rekker) {
+        root.getChildren().clear();
+        root.getChildren().addAll(
+                menyBar(),
+                visSummering(),
+                KomponenterGUI.lagLykkeHjulPane(lykkeHjul),
+                RekkePanelVisning.visRekkerFraFil(rekker)
+        );
+    }
 
-    public static ArrayList<int[]> lesFil (String filnavn) {
-        ArrayList<int[]> rekker = new ArrayList<>();
+
+    public static ArrayList<ArrayList<Integer>> lesFil (String filnavn) {
+        ArrayList<ArrayList<Integer>> rekker = new ArrayList<>();
         File fil = new File(filnavn);
         int antallRekker = 0;
-
         try {
             Scanner scanner = new Scanner(fil);
             while (scanner.hasNextLine()){
@@ -297,29 +322,22 @@ public class KontrollerGUI extends Application {
         }catch (Exception e){
             e.printStackTrace();
         }
-
         String[] linjer = new String[antallRekker];
-
         try{
             Scanner scanner = new Scanner(fil);
             for(int i = 0; i < antallRekker; i++){
                 linjer[i] = scanner.nextLine();
-                //System.out.println(linjer[i]);
             }
-
         }catch (Exception e){
             System.out.println("Problemer med fil");
             e.printStackTrace();
         }
-
         for(int i = 0; i < linjer.length; i++){
-            int[] arr = new int[7];
-
+            ArrayList<Integer> arr = new ArrayList<>();
             try {
                 String[] linje = linjer[i].split(" ");
-                //System.out.println(linjer[i]);
                 for (int k = 0; k < 7; k++) {
-                    arr[k] = Integer.parseInt(linje[k]);
+                    arr.add(Integer.parseInt(linje[k]));
                 }
                 rekker.add(arr);
             }catch (Exception e){
@@ -330,7 +348,7 @@ public class KontrollerGUI extends Application {
             }
         }
         System.out.println(rekker);
-        root.getChildren().add(new RekkePanelVisning(rekker));
+        visFraFil(rekker);
         return rekker;
     }
 

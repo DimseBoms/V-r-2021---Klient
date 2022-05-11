@@ -17,9 +17,12 @@ public class TallTrekkVisning extends HBox {
     private int rekkeNr = 0;
     private boolean tilSletting;
     protected static ArrayList<TallTrekkVisning> rekkeVisninger = new ArrayList<>();
+    boolean vinnerStatus = false;
+    int verdi;
 
 
     public TallTrekkVisning(int tall) {
+        this.verdi = tall;
         this.rekkeNr++;
         this.stackPane = new StackPane();
         this.sirkel = new Circle(RADIUS);
@@ -50,12 +53,20 @@ public class TallTrekkVisning extends HBox {
 
     }
 
+    public int getVerdi() {
+        return verdi;
+    }
 
     public static ArrayList<TallTrekkVisning> getRekkeVisninger() {
         return rekkeVisninger;
     }
 
     public boolean isTilSletting() {return tilSletting;}
+
+    public void setVunnet() {
+        this.vinnerStatus = true;
+        this.sirkel.setFill(Color.GOLD);
+    }
 
     /*
     private static void slettMarkerteTall() {

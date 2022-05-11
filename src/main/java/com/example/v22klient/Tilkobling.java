@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -69,7 +70,7 @@ public class Tilkobling {
     public void sendRekke(Bruker bruker) {
         try {
             // Oppretter og sender HashMap med bruker sine rekker
-            System.out.println("Sender rekker:");
+            System.out.println("Sender rekker...");
             System.out.println("Rekkeliste: " + bruker.rekkeListe);
             System.out.println("Satsliste: " + bruker.innsatsListe);
             HashMap<Object, Object> brukerMap = new HashMap<>();
@@ -79,14 +80,27 @@ public class Tilkobling {
             utStrøm.writeObject(brukerMap);
             // Tar imot og behandler svar fra tjeneren
             System.out.println("Venter på respons fra server med svar på rekker...");
-            this.innStrøm = new ObjectInputStream(socket.getInputStream());
             HashMap<Object, Object> svar = (HashMap<Object, Object>) innStrøm.readObject();
             System.out.println(svar.toString());
+            sjekkVunnet(svar);
         } catch (IOException e) {
             // Gracefully close everything.
             closeEverything(socket, innStrøm, utStrøm);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    // Denne metoden skal iterere gjennom alle verdiene i svar og sjekke alle verdiene i RekkePanelene
+    // For deretter å endre farge på vinnerkulene til grønn.
+    private void sjekkVunnet(HashMap<Object, Object> svar) {
+        ArrayList<Integer> svarListe = (ArrayList<Integer>) svar.get("vinnerRekke");
+        for (int vinnerTall : svarListe) {
+            for (RekkePanelVisning rad : RekkePanelVisning.rammer) {
+                for (TallTrekkVisning tallBall : rad.getTallBallArray()) {
+                    if (tallBall.getVerdi() == vinnerTall) tallBall.setVunnet();
+                }
+            }
         }
     }
 

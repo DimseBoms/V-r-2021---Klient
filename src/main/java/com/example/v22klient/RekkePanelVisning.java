@@ -1,11 +1,13 @@
 package com.example.v22klient;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -17,6 +19,7 @@ public class RekkePanelVisning extends HBox {
     private static int antallRekker = 1;
     protected int rammeId = 1;
     protected static ArrayList<RekkePanelVisning> rammer = new ArrayList<>();
+    ArrayList<TallTrekkVisning> tallBallArray;
     private Button slettRekkePanel;
     private static TextField innsats;
     private int kronerSatset;
@@ -27,6 +30,7 @@ public class RekkePanelVisning extends HBox {
     static double total;
 
     public RekkePanelVisning() {
+        tallBallArray = new ArrayList<>();
         this.setSpacing(15);
         this.label = new Label();
         this.label.setFont(Font.font("Arial", FontWeight.BOLD, 15));
@@ -39,59 +43,10 @@ public class RekkePanelVisning extends HBox {
         this.innsats = new TextField();
         this.innsats.setPrefWidth(BREDDE);
         this.innsats.setPromptText("Innsats");
-
-   //     this.innsats.setOnAction(e-> {
-  //          if (Double.parseDouble(innsats.getText()) == 0) {
-   //             total += Double.parseDouble(innsats.getText());
- //               System.out.println(total);
- //           }
-  //      });
-      //  this.innsats.setOnKeyTyped(e-> {
-     //       aggregerInnsats();
-      //      System.out.println("Aggregerer");
-     //   });
         this.getChildren().addAll(stackPane, slettRekkePanel, innsats);
         this.lyttPåSlettRekkePanel();
-    //    this.lyttPåInnsats();
         this.rammeId++;
         this.rammer.add(this);
-    }
-
-    /**
-     * Konstruktør som tar inn en ArrayList av int[]
-     * Bygger opp visning av rekker fra fil
-     * @param rekkerFraFil
-     */
-    public RekkePanelVisning(ArrayList<int[]> rekkerFraFil) {
-        this.setSpacing(15);
-        this.label = new Label();
-        this.label.setFont(Font.font("Arial", FontWeight.BOLD, 15));
-        this.label.setTextFill(Color.WHITE);
-        this.label.setText("Rekke " + antallRekker++);
-        this.label.setTextAlignment(TextAlignment.CENTER);
-        this.stackPane = new StackPane(this.label);
-        this.slettRekkePanel = new Button("Slett");
-        this.slettRekkePanel.setPrefWidth(BREDDE);
-        this.innsats = new TextField();
-        this.innsats.setPrefWidth(BREDDE);
-        this.innsats.setPromptText("Innsats");
-        this.getChildren().addAll(stackPane, slettRekkePanel, innsats);
-        int teller = 0;
-
-        for(int[] liste : rekkerFraFil){
-            for(int i = 0; i < 1; i++){
-                this.getChildren().add(new TallTrekkVisning(liste[i]));
-            }
-    //        pane.add(rekkeVisning)
-        }
-
- //       for (int[] tall : rekkerFraFil) {
-//            int siffer = tall[teller];
- //           teller++;
- //           this.getChildren().add(new TallTrekkVisning(siffer));
-  //      }
-
-
     }
 
     public static double hentInnsats() {
@@ -106,18 +61,7 @@ public class RekkePanelVisning extends HBox {
     public double getInnsats() {
         return Double.parseDouble(innsats.getText());
     }
-/*
-    protected static double aggregerInnsats() {
-        for (RekkePanelVisning r : rammer) {
-            total += r.getInnsats();
-        }
-        System.out.println(total);
-        return total;
 
-    }
-
-
- */
     protected static double aggregerInnsats() {
         return total;
 
@@ -138,5 +82,28 @@ public class RekkePanelVisning extends HBox {
         });
     }
 
+    protected static VBox visRekkerFraFil(ArrayList<ArrayList<Integer>> rekkerFraFil) {
+        VBox boks = new VBox();
+        boks.setPadding(new Insets(10));
+        boks.setSpacing(5);
+        boks.setStyle("-fx-background-color: dimgrey");
+        for(ArrayList<Integer> liste : rekkerFraFil){
+            RekkePanelVisning rekke = new RekkePanelVisning();
+            for (int k = 0; k < 7; k++){
+                rekke.getChildren().add(new TallTrekkVisning(liste.get(k)));
+            }
+            boks.getChildren().add(rekke);
+        }
+        return boks;
+    }
+
+    void leggTilResponsivBall(TallTrekkVisning tallBall) {
+        tallBallArray.add(tallBall);
+        this.getChildren().add(tallBall);
+    }
+
+    public ArrayList<TallTrekkVisning> getTallBallArray() {
+        return tallBallArray;
+    }
 }
 
