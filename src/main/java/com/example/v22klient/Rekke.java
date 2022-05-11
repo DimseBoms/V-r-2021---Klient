@@ -18,6 +18,15 @@ public class Rekke {
         bruker.rekkeListe.add(this.tallRekke);
     }
 
+    @Override
+    public String toString() {
+        return "Rekke{" +
+                "tallRekke=" + tallRekke +
+                ", innsats=" + innsats +
+                ", gevinst=" + gevinst +
+                '}';
+    }
+
     public void setGevinst(double gevinst) {
         this.gevinst = gevinst;
     }

@@ -43,8 +43,8 @@ public class Tilkobling {
             brukerMap.put("etternavn", bruker.getEtternavn());
             brukerMap.put("epost", bruker.getEpost());
             brukerMap.put("tlf", bruker.getTlf());
-            utStrøm.writeObject(brukerMap);
             System.out.println("Sender innloggingsforsøk til serveren " + brukerMap);
+            utStrøm.writeObject(brukerMap);
             // Tar imot og behandler svar fra tjeneren
             this.innStrøm = new ObjectInputStream(socket.getInputStream());
             HashMap<Object, Object> svar = (HashMap<Object, Object>) innStrøm.readObject();
@@ -67,23 +67,18 @@ public class Tilkobling {
 
     // Send data
     public void sendRekke(Bruker bruker) {
-
-
         try {
-
             // Oppretter og sender HashMap med bruker sine rekker
-
+            System.out.println("Sender rekker:");
+            System.out.println("Rekkeliste: " + bruker.rekkeListe);
+            System.out.println("Satsliste: " + bruker.innsatsListe);
             HashMap<Object, Object> brukerMap = new HashMap<>();
-
             brukerMap.put("query", "sendRekke");
             brukerMap.put("rekker", bruker.rekkeListe);
             brukerMap.put("innsats", bruker.innsatsListe);
             utStrøm.writeObject(brukerMap);
-
-
-            System.out.println("starter å sende rekke");
-
             // Tar imot og behandler svar fra tjeneren
+            System.out.println("Venter på respons fra server med svar på rekker...");
             this.innStrøm = new ObjectInputStream(socket.getInputStream());
             HashMap<Object, Object> svar = (HashMap<Object, Object>) innStrøm.readObject();
             System.out.println(svar.toString());
@@ -93,7 +88,6 @@ public class Tilkobling {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     // Hjelpemetode for å lukke alle åpne strømmer og sockets

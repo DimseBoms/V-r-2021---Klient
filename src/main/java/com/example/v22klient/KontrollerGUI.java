@@ -114,17 +114,9 @@ public class KontrollerGUI extends Application {
         }
     }
 
-    private static void testSendingAvRekke(Bruker bruker) {
-        ArrayList<Integer> rekkeMedTall = new ArrayList<>();
-        rekkeMedTall.add(69);
-        rekkeMedTall.add(69);
-        rekkeMedTall.add(69);
-        rekkeMedTall.add(69);
-        rekkeMedTall.add(12);
-        rekkeMedTall.add(42);
-        rekkeMedTall.add(12);
-        //Rekke rekke= new Rekke(rekkeMedTall, 5, bruker);
-        //tilkobling.sendRekke(bruker);
+    // TODO: Skal fjerne en rekke fra rekkeObjektListe. Skal den ta imot en id av noe slag??
+    private static void fjernRekke() {
+        System.out.println("Startet fjernRekke()");
     }
 
     /**
@@ -163,32 +155,9 @@ public class KontrollerGUI extends Application {
                 KomponenterGUI.resetToggle();
                 KomponenterGUI.rekkeTall.clear();
                 KomponenterGUI.toggleTeller = 0;
-                // OK TODO: Tekst for rekker: Text, Font, Farge
-                // OK TODO: Når full rekke: untoggle alle valgte toggleButtons (toggle bør gi fargebytte knapper)
-                // TODO: VINNERTALL SAMMENLIGNES MOT ALLE TALL, UAVHENGIG AV REKKE OG REKKEFØLGE
-                // TODO: match på vinnertall = grønne kuler
-                // TODO: Total innsats pr spill må summeres og vises + TOTAL PREMIE
-                // TODO: Knapp for å spille "KJØR TREKNING" (når rekker og innsats er ok)
-                // TODO: Automatisk etablering av rekker fra fil (sleep, fargebytter, OBS: IKKE EDITERING)
-                // TODO: Skal man kunne slette kuler i siste rad? (MINDE VIKTIG?)
-                // TODO: INNSATS: mellom 1 - 100 kroner, 5 kroner er default
-                // TODO: Hvis gevinst på rekke, vis premie for rekke i tekstfelt (innsats)
-
-
-                // TODO: DEBUGGING, ALLE
-                // TODO: Metode for å bytte ut komponenter i visning - eget knappepanel for å velge
-                // TODO: Implementere kode for innlesing fra fil (husk FileNotFoundEx)
-                // TODO: RYDDE I KODE: KONSTANTER I STORE BOKSTAVER, MINDRE STATIC?, GETTERE/ SETTERE
-                // TODO: Regex sjekk av datafelt på SERVER (Ligger allerede på klient, men krav om server)
-                // TODO: Lydeffekter lykkehjul?
-                // TODO: Args til doc: Lykkehjul frittstående komponent (delte egenskaper: arc, kule, tall, rekke)
-                // TODO: Args til doc:
-                // TODO: RAPPORT i PDF: SKJERMDUMPER + KORTE BESKRIVELSER AV KLIENTPROGRAMMET I ULIKE SITUASJONER
-                // TODO: RAPPORT I PDF: BESKRIVE DATABASESTRUKTUREN (ER-DIAGRAM?)
-                // TODO: I RAPPORT: HVA MED MOBILE ENHETER?
-                // TODO: RAPPORT I PDF (VALFRITT): KLASSEDIAGRAM
-                //   KomponenterGUI.tallKnapperListe.get(k).setSelected(false);
-
+                // Sender utfylt rekke til metode som legger til rekke for sending.
+                int placeholderInt = 30;
+                new Rekke(KomponenterGUI.rekkeTall, placeholderInt, bruker);
             }
         }
         trekkTall2();
@@ -287,16 +256,15 @@ public class KontrollerGUI extends Application {
         MenuItem miA1 = new MenuItem("Trekk tall");
         MenuItem miA2 = new MenuItem("Generer sum innsats");
         MenuItem miA3 = new MenuItem("Generer sum gevinst");
+        MenuItem mia4 = new MenuItem("Send rekker og satser");
 
         miA0.setOnAction(e-> lykkeHjul.spin());
         miA1.setOnAction(e-> velgTall(34) );
-        miA2.setOnAction(e-> {
-
-            oppdaterSum(1, RekkePanelVisning.hentInnsats());
-        });
+        miA2.setOnAction(e-> oppdaterSum(1, RekkePanelVisning.hentInnsats()));
+        mia4.setOnAction(e-> tilkobling.sendRekke(bruker));
 //        miA3.setOnAction(e-> oppdaterSum(2, RekkePanelVisning.aggregerInnsats()));
 
-        meny1.getItems().addAll(miA0, miA1, miA2, miA3);
+        meny1.getItems().addAll(miA0, miA1, miA2, miA3, mia4);
 
         mb.getMenus().addAll(meny1);
         return mb;
@@ -379,3 +347,29 @@ public class KontrollerGUI extends Application {
     }
 
 }
+
+// OK TODO: Tekst for rekker: Text, Font, Farge
+// OK TODO: Når full rekke: untoggle alle valgte toggleButtons (toggle bør gi fargebytte knapper)
+// TODO: VINNERTALL SAMMENLIGNES MOT ALLE TALL, UAVHENGIG AV REKKE OG REKKEFØLGE
+// TODO: match på vinnertall = grønne kuler
+// TODO: Total innsats pr spill må summeres og vises + TOTAL PREMIE
+// TODO: Knapp for å spille "KJØR TREKNING" (når rekker og innsats er ok)
+// TODO: Automatisk etablering av rekker fra fil (sleep, fargebytter, OBS: IKKE EDITERING)
+// TODO: Skal man kunne slette kuler i siste rad? (MINDE VIKTIG?)
+// TODO: INNSATS: mellom 1 - 100 kroner, 5 kroner er default
+// TODO: Hvis gevinst på rekke, vis premie for rekke i tekstfelt (innsats)
+
+
+// TODO: DEBUGGING, ALLE
+// TODO: Metode for å bytte ut komponenter i visning - eget knappepanel for å velge
+// TODO: Implementere kode for innlesing fra fil (husk FileNotFoundEx)
+// TODO: RYDDE I KODE: KONSTANTER I STORE BOKSTAVER, MINDRE STATIC?, GETTERE/ SETTERE
+// TODO: Regex sjekk av datafelt på SERVER (Ligger allerede på klient, men krav om server)
+// TODO: Lydeffekter lykkehjul?
+// TODO: Args til doc: Lykkehjul frittstående komponent (delte egenskaper: arc, kule, tall, rekke)
+// TODO: Args til doc:
+// TODO: RAPPORT i PDF: SKJERMDUMPER + KORTE BESKRIVELSER AV KLIENTPROGRAMMET I ULIKE SITUASJONER
+// TODO: RAPPORT I PDF: BESKRIVE DATABASESTRUKTUREN (ER-DIAGRAM?)
+// TODO: I RAPPORT: HVA MED MOBILE ENHETER?
+// TODO: RAPPORT I PDF (VALFRITT): KLASSEDIAGRAM
+//   KomponenterGUI.tallKnapperListe.get(k).setSelected(false);
