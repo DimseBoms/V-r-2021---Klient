@@ -10,11 +10,13 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,12 +72,13 @@ public class KontrollerGUI extends Application {
                 // Viser hovedvindu
                 root.getChildren().clear();
                 Button btnSpin = new Button("Spinn");
-                root.getChildren().addAll(KomponenterGUI.lagLykkeHjulPane(lykkeHjul), KomponenterGUI.lagVelgTallPane(feltAntall), btnSpin);
+                root.getChildren().addAll(KomponenterGUI.lagLykkeHjulPane(lykkeHjul), KomponenterGUI.lagVelgInputPane());
+                //KomponenterGUI.lagVelgTallPane(feltAntall), btnSpin
                 btnSpin.setOnAction( e -> {
                     if (!lykkeHjul.getAktivSpin())
                     lykkeHjul.spin();
                 } );
-                testSendingAvRekke(bruker);
+                //testSendingAvRekke(bruker);
                 // Viser velkomstmelding
                 Alert utilgjengeligBrukerAlert = new Alert(Alert.AlertType.CONFIRMATION);
                 utilgjengeligBrukerAlert.setHeaderText("Velkommen " + tilkobling.getBruker().getFornavn());
@@ -138,10 +141,75 @@ public class KontrollerGUI extends Application {
                 }
             }
             if(KomponenterGUI.rekkeTall.size() == 7){
-
+                // make new rekke
+                // add rekke to rekkepane
             }
         }
         System.out.println(KomponenterGUI.rekkeTall);
+    }
+
+    public static ArrayList<int[]> lesFil(){
+        ArrayList<int[]> rekker = new ArrayList<>();
+        File fil = new File(KomponenterGUI.filNavn);
+        int antallRekker = 0;
+
+        try {
+            Scanner scanner = new Scanner(fil);
+            while (scanner.hasNextLine()){
+                antallRekker++;
+                scanner.nextLine();
+            }
+            scanner.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        String[] linjer = new String[antallRekker];
+
+        try{
+            Scanner scanner = new Scanner(fil);
+            for(int i = 0; i < antallRekker; i++){
+                linjer[i] = scanner.nextLine();
+                //System.out.println(linjer[i]);
+            }
+
+        }catch (Exception e){
+            System.out.println("Problemer med fil");
+            e.printStackTrace();
+        }
+
+        for(int i = 0; i < linjer.length; i++){
+            int[] arr = new int[7];
+
+            try {
+                String[] linje = linjer[i].split(" ");
+                //System.out.println(linjer[i]);
+                for (int k = 0; k < 7; k++) {
+                    arr[k] = Integer.parseInt(linje[k]);
+                }
+                rekker.add(arr);
+            }catch (Exception e){
+                System.out.println("Det er en feil i filen. Sjekk tekstfilen og prøv igjen.");
+                varsleBruker("Det er en feil i tekstfilen.");
+                rekker.clear();
+                break;
+            }
+        }
+        System.out.println(rekker);
+
+        return rekker;
+    }
+
+    /**
+     * Meldinger til bruker med class Alert
+     * @param melding - tar imot og viser String
+     */
+    private static void varsleBruker(String melding) {
+        var alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("");
+        alert.setHeaderText("Melding til bruker:");
+        alert.setContentText(melding);
+        alert.showAndWait().ifPresent((btnType) -> {});
     }
 
 }

@@ -11,7 +11,10 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class KomponenterGUI {
@@ -19,6 +22,9 @@ public class KomponenterGUI {
     public static TextField telefonInput, epostInput, fNavnInput, eNavnInput;
     public static ArrayList<ToggleButton> tallKnapperListe;
     public static ArrayList<Integer> rekkeTall;
+    public static Button velgSelv, lastOppFil, lastOpp;
+    public static String filNavn;
+    public static VBox velgInputPane;
 
     public static VBox lagLykkeHjulPane(Lykkehjul lykkeHjul){
         double nålLengde = KontrollerGUI.WIDTH/30;
@@ -94,7 +100,7 @@ public class KomponenterGUI {
         mainBoks.setAlignment(Pos.CENTER);
         mainBoks.setMaxWidth(400);
         mainBoks.setPadding(new Insets(20, 20, 20, 20));
-        mainBoks.setBackground(Background.fill(Color.WHITE));
+        mainBoks.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null))); // Det var en rød strek her. Endret background
 
         mainBoks.getChildren().addAll(new Label("Fornavn"), fNavnInput, new Label("Etternavn"), eNavnInput);
         mainBoks.getChildren().addAll(new Label("Telefon"), telefonInput);
@@ -111,6 +117,51 @@ public class KomponenterGUI {
 
         return loggInnPane;
     }
+
+    public static VBox lagVelgInputPane(){
+        velgInputPane = new VBox();
+        velgSelv = new Button("Velg tall selv");
+        velgSelv.setOnAction( event ->{
+            System.out.println("Vis tallknapper osv");
+            KontrollerGUI.root.getChildren().remove(velgInputPane);
+            KontrollerGUI.root.getChildren().add(lagVelgTallPane(34));
+        });
+
+        lastOppFil = new Button("Last opp rekker fra fil");
+        lastOppFil.setOnAction( event -> {
+            lagLastOppFilPane();
+        });
+
+        velgInputPane.getChildren().addAll(velgSelv, lastOppFil);
+        return velgInputPane;
+    }
+
+    public static void lagLastOppFilPane(){
+        velgInputPane.getChildren().clear();
+        lastOpp = new Button("Last opp");
+        lastOpp.setOnAction( event -> KontrollerGUI.lesFil());
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Velg filen du vil laste opp");
+
+        File file = fileChooser.showOpenDialog(new Stage());
+
+
+        if(file != null) {
+            filNavn = file.toString();
+            Label lbl = new Label(filNavn);
+            lbl.setTextFill(Color.WHITE);
+            Button lastOppNy = new Button("Velg ny fil");
+            lastOppNy.setOnAction( event -> {
+                velgInputPane.getChildren().clear();
+                lagLastOppFilPane();
+            });
+            velgInputPane.getChildren().addAll(lbl, lastOpp, lastOppNy);
+        }
+
+    }
+
+
     //gevinst-visning
 
 
