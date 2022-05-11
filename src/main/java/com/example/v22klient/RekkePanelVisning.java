@@ -21,7 +21,7 @@ public class RekkePanelVisning extends HBox {
     protected static ArrayList<RekkePanelVisning> rammer = new ArrayList<>();
     ArrayList<TallTrekkVisning> tallBallArray;
     private Button slettRekkePanel;
-    private static TextField innsats;
+    private TextField innsats;
     private int kronerSatset;
     private StackPane stackPane;
     private Label label;
@@ -44,12 +44,13 @@ public class RekkePanelVisning extends HBox {
         this.innsats.setPrefWidth(BREDDE);
         this.innsats.setPromptText("Innsats");
         this.getChildren().addAll(stackPane, slettRekkePanel, innsats);
+        this.lyttPåInnsats();
         this.lyttPåSlettRekkePanel();
         this.rammeId++;
         this.rammer.add(this);
     }
 
-    public static double hentInnsats() {
+    public double hentInnsats() {
         for (RekkePanelVisning r : rammer) {
             if (!innsats.getText().equals(""))
                 total += r.getInnsats();
@@ -59,7 +60,9 @@ public class RekkePanelVisning extends HBox {
     }
 
     public double getInnsats() {
-        return Double.parseDouble(innsats.getText());
+        if (!innsats.getText().isEmpty()) {
+            return Double.parseDouble(innsats.getText());
+        } else return 0;
     }
 
     protected static double aggregerInnsats() {
@@ -71,6 +74,11 @@ public class RekkePanelVisning extends HBox {
         this.innsats.setOnAction(e-> {
             this.kronerSatset = Integer.parseInt(innsats.getText());
             System.out.println("innsats avlest: " + this.kronerSatset);
+            double sum = 0;
+            for (RekkePanelVisning rad : rammer) {
+                sum += rad.getInnsats();
+            }
+            KontrollerGUI.oppdaterSum(1, sum);
         });
     }
 

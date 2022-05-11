@@ -262,7 +262,7 @@ public class KontrollerGUI extends Application {
 
         miA0.setOnAction(e-> lykkeHjul.spin());
         miA1.setOnAction(e-> velgTall(34) );
-        miA2.setOnAction(e-> oppdaterSum(1, RekkePanelVisning.hentInnsats()));
+        //miA2.setOnAction(e-> oppdaterSum(1, RekkePanelVisning.hentInnsats()));
         mia4.setOnAction(e-> tilkobling.sendRekke(bruker));
 //        miA3.setOnAction(e-> oppdaterSum(2, RekkePanelVisning.aggregerInnsats()));
 
